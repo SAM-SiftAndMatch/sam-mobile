@@ -1,0 +1,51 @@
+// Exact legacy translations keep user-written projects and chat messages intact.
+export const projectTranslations = {
+  'Build a React Native Marketplace Mobile App': 'Xây dựng ứng dụng kết nối khách hàng và freelancer bằng React Native',
+  'Redesign Mobile Banking UX/UI Kit in Figma': 'Thiết kế lại giao diện ứng dụng ngân hàng trên Figma',
+  'Node.js REST API & Authentication Microservice': 'Xây dựng REST API và dịch vụ xác thực bằng Node.js',
+  'AI Chatbot Integration for E-Commerce App': 'Tích hợp chatbot AI cho ứng dụng thương mại điện tử',
+  'Brand Strategy & Copywriting for Tech Startup': 'Xây dựng chiến lược thương hiệu và nội dung cho startup công nghệ',
+  'We are seeking an experienced React Native developer to create a modern mobile marketplace prototype. Must follow clean component architecture, seamless UI transitions, and easy API service integration.': 'Chúng tôi cần lập trình viên React Native có kinh nghiệm để xây dựng bản mẫu ứng dụng kết nối khách hàng và freelancer. Ứng dụng cần có cấu trúc thành phần rõ ràng, chuyển cảnh mượt mà và dễ tích hợp API.',
+  'Need an expert UI/UX designer to craft a modern, glassmorphic dark & light theme mobile banking component system in Figma with prototypes.': 'Cần chuyên gia thiết kế UI/UX xây dựng hệ thống giao diện ứng dụng ngân hàng trên Figma, hỗ trợ chế độ sáng và tối, hiệu ứng kính mờ hiện đại và bản mẫu tương tác.',
+  'Looking for a backend developer to build scalable JWT authentication and job submission microservices connected to MongoDB/PostgreSQL.': 'Tìm lập trình viên backend xây dựng dịch vụ xác thực JWT và dịch vụ đăng dự án có khả năng mở rộng, kết nối với MongoDB hoặc PostgreSQL.',
+  'Integrate LLM API endpoints into an existing React Native app with streaming responses, markdown preview, and custom UI bubble controls.': 'Tích hợp API mô hình ngôn ngữ lớn vào ứng dụng React Native hiện có, hỗ trợ phản hồi theo thời gian thực, hiển thị Markdown và giao diện bong bóng hội thoại tùy chỉnh.',
+  'Create brand guidelines, landing page messaging, and taglines for our upcoming AI product launch.': 'Xây dựng bộ hướng dẫn thương hiệu, nội dung trang giới thiệu và khẩu hiệu cho sản phẩm AI sắp ra mắt.',
+  'Minimum 3 years React Native experience': 'Có ít nhất 3 năm kinh nghiệm với React Native',
+  'Proven track record with mobile UI design systems': 'Có kinh nghiệm thực tế với hệ thống thiết kế giao diện di động',
+  'Clean JavaScript standard code without bloated dependencies': 'Mã JavaScript rõ ràng, đúng chuẩn và hạn chế thư viện không cần thiết',
+  'Figma component variants experience': 'Có kinh nghiệm tạo các biến thể thành phần trên Figma',
+  'Pixel-perfect iOS and Android guidelines': 'Thiết kế chính xác, tuân thủ hướng dẫn giao diện iOS và Android',
+  'Interactive component prototypes': 'Xây dựng bản mẫu có các thành phần tương tác',
+  'Experience writing secure REST API endpoints': 'Có kinh nghiệm xây dựng REST API an toàn',
+  'Unit test coverage above 80%': 'Độ bao phủ kiểm thử đơn vị trên 80%',
+  'Docker setup provided': 'Bàn giao cấu hình triển khai bằng Docker',
+  'Experience with OpenAI or Gemini API integration': 'Có kinh nghiệm tích hợp API OpenAI hoặc Gemini',
+  'Smooth animation & text streaming UI handling': 'Xử lý hiệu ứng chuyển động và hiển thị văn bản theo luồng mượt mà',
+  'Portfolio of SaaS/Tech copywriting samples': 'Có hồ sơ các bài viết mẫu về SaaS hoặc công nghệ',
+  'Strong understanding of SEO & user engagement': 'Hiểu rõ SEO và cách thu hút người dùng',
+  'Web Development': 'Lập trình web', 'Mobile Development': 'Lập trình di động',
+  'UI/UX Design': 'Thiết kế UI/UX', 'Graphic Design': 'Thiết kế đồ họa',
+  'Writing & Translation': 'Viết lách & dịch thuật', 'Digital Marketing': 'Tiếp thị số',
+  'AI & Data Science': 'AI & khoa học dữ liệu', 'Remote': 'Làm việc từ xa',
+  'Prototyping': 'Thiết kế bản mẫu', 'Design System': 'Hệ thống thiết kế',
+  'AI Integration': 'Tích hợp AI', 'Copywriting': 'Viết nội dung quảng cáo',
+  'Brand Strategy': 'Chiến lược thương hiệu', 'Content Marketing': 'Tiếp thị nội dung',
+  '10 days': '10 ngày', '7 days': '7 ngày', '5 days': '5 ngày', '12 days': '12 ngày',
+  'Hi Sarah! I have built multiple production React Native apps using clean modular JS architecture and Expo. I can deliver this marketplace UI prototype efficiently.': 'Chào Sarah! Tôi đã xây dựng nhiều ứng dụng React Native thực tế bằng Expo với cấu trúc JavaScript theo mô-đun rõ ràng. Tôi có thể hoàn thành bản mẫu giao diện ứng dụng này hiệu quả.',
+  'Hello Elena, I specialize in design systems and mobile banking interface design. Here is my Behance link with recent financial app mockups.': 'Chào Elena, tôi chuyên xây dựng hệ thống thiết kế và giao diện ứng dụng ngân hàng. Hồ sơ Behance của tôi có các mẫu thiết kế ứng dụng tài chính gần đây để bạn tham khảo.',
+  'I have built dozens of REST services in Express with JWT authentication. I can deliver structured code with clear API docs.': 'Tôi đã xây dựng nhiều dịch vụ REST bằng Express với xác thực JWT. Tôi có thể bàn giao mã nguồn có cấu trúc rõ ràng cùng tài liệu API đầy đủ.',
+  'I recently integrated OpenAI GPT-4o streaming APIs into a React Native commerce client. Excited to work on this!': 'Gần đây tôi đã tích hợp API phản hồi theo luồng của OpenAI GPT-4o vào ứng dụng thương mại điện tử React Native. Tôi rất mong được tham gia dự án này!',
+};
+
+export const projectTextVi = (value) => projectTranslations[value] || value;
+export const localizeProject = (project) => ({
+  ...project,
+  title: projectTextVi(project.title), description: projectTextVi(project.description),
+  category: projectTextVi(project.category), location: projectTextVi(project.location),
+  skills: project.skills?.map(projectTextVi), requirements: project.requirements?.map(projectTextVi),
+});
+export const localizeApplication = (application) => ({
+  ...application,
+  jobTitle: projectTextVi(application.jobTitle), coverLetter: projectTextVi(application.coverLetter),
+  deliveryTime: projectTextVi(application.deliveryTime), freelancerSkills: application.freelancerSkills?.map(projectTextVi),
+});
