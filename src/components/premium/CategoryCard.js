@@ -1,6 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 

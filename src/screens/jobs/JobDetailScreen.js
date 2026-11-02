@@ -1,37 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import UserAvatar from '../../components/common/UserAvatar';
-import StatusBadge from '../../components/common/StatusBadge';
-import CustomButton from '../../components/common/CustomButton';
-import LoadingState from '../../components/common/LoadingState';
+import { Header } from '../../components/common/Header';
+import { UserAvatar } from '../../components/common/UserAvatar';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { CustomButton } from '../../components/common/CustomButton';
+import { LoadingState } from '../../components/common/LoadingState';
 
 export const JobDetailScreen = ({ route, navigation }) => {
+  const insets = useSafeAreaInsets();
   const { jobId } = route.params || {};
   const { user, role } = useAuth();
   const { jobs, applications, openMessages } = useApp();
 
-  const [job, setJob] = useState(null);
-
-  useEffect(() => {
-    if (jobId) {
-      const found = jobs.find((j) => j.id === jobId);
-      if (found) setJob(found);
-    }
-  }, [jobId, jobs]);
+  const job = jobs.find(j => j.id === jobId);
 
   if (!job) {
     return (
@@ -138,7 +127,7 @@ export const JobDetailScreen = ({ route, navigation }) => {
       </ScrollView>
 
       {/* Bottom Sticky Action Footer */}
-      <View style={styles.footerBar}>
+      <View style={[styles.footerBar, { paddingBottom: Math.max(14, insets.bottom) }]}>
         {job.status === 'in_progress' && (isOwner || existingApp?.status === 'accepted') ? (
           <CustomButton title="Mở chat dự án" icon="chatbubbles-outline" onPress={() => openMessages((existingApp || applications.find((app) => app.jobId === job.id && app.status === 'accepted'))?.id)} />
         ) : isFreelancer ? (
@@ -232,9 +221,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   budgetBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
+    flexDirection: 'column',
+    gap: 14,
+    alignItems: 'stretch',
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
     paddingVertical: 14,
@@ -258,8 +247,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   budgetDivider: {
-    width: 1,
-    height: 30,
+    height: 1,
     backgroundColor: COLORS.border,
   },
   sectionCard: {

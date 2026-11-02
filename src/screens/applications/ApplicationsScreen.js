@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import StatusBadge from '../../components/common/StatusBadge';
-import ApplicantCard from '../../components/job/ApplicantCard';
-import UserAvatar from '../../components/common/UserAvatar';
-import EmptyState from '../../components/common/EmptyState';
-import LoadingState from '../../components/common/LoadingState';
+import { Header } from '../../components/common/Header';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { ApplicantCard } from '../../components/job/ApplicantCard';
+import { UserAvatar } from '../../components/common/UserAvatar';
+import { EmptyState } from '../../components/common/EmptyState';
+import { LoadingState } from '../../components/common/LoadingState';
 import { CustomButton } from '../../components/common/CustomButton';
 
 export const ApplicationsScreen = ({ route, navigation }) => {
@@ -30,7 +23,7 @@ export const ApplicationsScreen = ({ route, navigation }) => {
 
   const isFreelancer = role === 'freelancer';
 
-  // Filter applications list based on role & selected tab
+  // Filter đề xuất list based on role & selected tab
   const roleApplications = isFreelancer
     ? applications.filter(
         (app) => app.freelancerId === user?.id
@@ -49,8 +42,8 @@ export const ApplicationsScreen = ({ route, navigation }) => {
       await changeAppStatus(appId, status);
       if (status === 'accepted') return;
       Alert.alert(
-        'Status Updated',
-        `Application status changed to ${status.toUpperCase()}.`
+        'Đã cập nhật',
+        `Trạng thái đề xuất đã được cập nhật.`
       );
     } catch (err) {
       Alert.alert('Không thể cập nhật', err.message || 'Vui lòng thử lại.');
@@ -60,8 +53,8 @@ export const ApplicationsScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Header
-        title={isFreelancer ? 'My Proposals' : 'Job Applicants'}
-        subtitle={`${filteredApps.length} applications`}
+        title={isFreelancer ? 'Đề xuất của tôi' : 'Ứng viên dự án'}
+        subtitle={`${filteredApps.length} đề xuất`}
         showBack={!!jobId}
         rightIcon="chatbubbles-outline"
         onRightPress={() => openMessages()}
@@ -76,14 +69,14 @@ export const ApplicationsScreen = ({ route, navigation }) => {
             style={[styles.tabBtn, activeTab === tab && styles.activeTabBtn]}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {tab.toUpperCase()}
+              {{ all: 'Tất cả', pending: 'Đang chờ', accepted: 'Đã xác nhận', rejected: 'Từ chối' }[tab]}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
       {loading ? (
-        <LoadingState message="Loading applications..." />
+        <LoadingState message="Đang tải đề xuất…" />
       ) : (
         <FlatList
           data={filteredApps}
@@ -105,7 +98,7 @@ export const ApplicationsScreen = ({ route, navigation }) => {
                     <UserAvatar uri={item.customerAvatar} name={item.customerName} size={38} />
                     <View style={styles.customerCol}>
                       <Text style={styles.customerName}>{item.customerName}</Text>
-                      <Text style={styles.appliedDate}>Applied: {formatDate(item.appliedAt)}</Text>
+                      <Text style={styles.appliedDate}>Đã gửi: {formatDate(item.appliedAt)}</Text>
                     </View>
                     <StatusBadge status={item.status} />
                   </View>
@@ -114,15 +107,15 @@ export const ApplicationsScreen = ({ route, navigation }) => {
 
                   <View style={styles.priceRow}>
                     <View>
-                      <Text style={styles.priceLabel}>Proposed Price</Text>
+                      <Text style={styles.priceLabel}>Báo giá đề xuất</Text>
                       <Text style={styles.priceValue}>{formatCurrency(item.proposedPrice, item.currency)}</Text>
                     </View>
                     <View>
-                      <Text style={styles.priceLabel}>Delivery Time</Text>
+                      <Text style={styles.priceLabel}>Thời gian thực hiện</Text>
                       <Text style={styles.deliveryValue}>{item.deliveryTime}</Text>
                     </View>
                   </View>
-                  {item.status === 'accepted' ? <CustomButton title="Chat với khách hàng" icon="chatbubbles-outline" style={{ marginTop: 14 }} onPress={(event) => { event.stopPropagation(); openMessages(item.id); }} /> : item.status === 'pending' ? <Text style={{ color: COLORS.textMuted, marginTop: 12, fontSize: 12 }}>Chat sẽ mở sau khi khách hàng duyệt và dự án bắt đầu.</Text> : null}
+                  {item.status === 'accepted' ? <CustomButton title="Chat với khách hàng" icon="chatbubbles-outline" style={{ marginTop: 14 }} onPress={(event) => { event.stopPropagation(); openMessages(item.id); }} /> : item.status === 'pending' ? <Text style={{ color: COLORS.textMuted, marginTop: 12, fontSize: 12 }}>Bạn sẽ nhận thông báo khi khách hàng phản hồi.</Text> : null}
                 </TouchableOpacity>
               );
             }
@@ -135,7 +128,7 @@ export const ApplicationsScreen = ({ route, navigation }) => {
                 onReject={() => handleStatusChange(item.id, 'rejected')}
                 onChat={() => openMessages(item.id)}
                 onViewProfile={() =>
-                  Alert.alert('Applicant Profile', `${item.freelancerName}'s full profile detail`)
+                  Alert.alert('Hồ sơ ứng viên', `Hồ sơ của ${item.freelancerName}`)
                 }
               />
             );
@@ -143,13 +136,13 @@ export const ApplicationsScreen = ({ route, navigation }) => {
           ListEmptyComponent={
             <EmptyState
               icon="paper-plane-outline"
-              title="No Applications Found"
+              title="Chưa có đề xuất"
               message={
                 isFreelancer
-                  ? "You haven't submitted any proposals under this category."
-                  : "No applicants received for your posted jobs yet."
+                  ? "Bạn chưa có đề xuất ở trạng thái này."
+                  : "Chưa có ứng viên cho dự án của bạn."
               }
-              actionTitle={isFreelancer ? 'Browse Jobs' : 'Post a Job'}
+              actionTitle={isFreelancer ? 'Tìm việc' : 'Đăng dự án'}
               onAction={() =>
                 navigation.navigate(isFreelancer ? 'Jobs' : 'CreatePost')
               }
@@ -176,6 +169,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   tabBtn: {
+    minHeight: 44,
+    justifyContent: 'center',
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,

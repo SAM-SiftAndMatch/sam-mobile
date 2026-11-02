@@ -1,18 +1,13 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatDate } from '../../utils/formatCurrency';
 import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import EmptyState from '../../components/common/EmptyState';
+import { Header } from '../../components/common/Header';
+import { EmptyState } from '../../components/common/EmptyState';
 
 export const NotificationsScreen = ({ navigation }) => {
   const { notifications, markRead } = useApp();
@@ -34,7 +29,7 @@ export const NotificationsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header title="Notifications" showBack />
+      <Header title="Thông báo" showBack />
 
       <FlatList
         data={notifications}
@@ -71,8 +66,8 @@ export const NotificationsScreen = ({ navigation }) => {
         ListEmptyComponent={
           <EmptyState
             icon="notifications-off-outline"
-            title="No Notifications"
-            message="You don't have any notifications at the moment."
+            title="Chưa có thông báo"
+            message="Thông báo về dự án và tài khoản sẽ xuất hiện tại đây."
           />
         }
       />

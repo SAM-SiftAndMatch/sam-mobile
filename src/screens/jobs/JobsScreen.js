@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import SearchBar from '../../components/common/SearchBar';
-import JobCard from '../../components/job/JobCard';
-import EmptyState from '../../components/common/EmptyState';
-import LoadingState from '../../components/common/LoadingState';
+import { Header } from '../../components/common/Header';
+import { SearchBar } from '../../components/common/SearchBar';
+import { JobCard } from '../../components/job/JobCard';
+import { EmptyState } from '../../components/common/EmptyState';
+import { LoadingState } from '../../components/common/LoadingState';
 
 export const JobsScreen = ({ navigation }) => {
   const { role } = useAuth();
@@ -194,6 +187,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pill: {
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: SIZES.radiusFull,
@@ -227,6 +222,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   statusPill: {
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 6,

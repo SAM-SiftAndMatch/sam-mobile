@@ -9,7 +9,7 @@ export const SIZES = {
   font: 14,
   radius: 12,
   radiusSm: 8,
-  radiusLg: 20,
+  radiusLg: 12,
   radiusFull: 999,
   padding: 16,
   paddingSm: 10,
@@ -24,7 +24,7 @@ export const SIZES = {
   body2: 14,
   body3: 13,
   caption: 12,
-  tiny: 10,
+  tiny: 12,
 
   // Screen dimensions
   width,
@@ -35,9 +35,9 @@ export const SHADOWS = {
   light: {
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowRadius: 6,
-    elevation: 2,
+    elevation: 1,
   },
   medium: {
     shadowColor: '#0F172A',

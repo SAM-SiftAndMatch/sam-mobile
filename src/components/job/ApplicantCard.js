@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency } from '../../utils/formatCurrency';
-import UserAvatar from '../common/UserAvatar';
-import StatusBadge from '../common/StatusBadge';
-import CustomButton from '../common/CustomButton';
+import { UserAvatar } from '../common/UserAvatar';
+import { StatusBadge } from '../common/StatusBadge';
+import { CustomButton } from '../common/CustomButton';
 
 export const ApplicantCard = ({
   applicant,
@@ -30,7 +31,7 @@ export const ApplicantCard = ({
             <Text style={styles.ratingText}>{applicant.freelancerRating || '4.9'}</Text>
             <Text style={styles.dot}>•</Text>
             <Ionicons name="time-outline" size={12} color={COLORS.textMuted} />
-            <Text style={styles.timeText}>{applicant.deliveryTime || '7 days'}</Text>
+            <Text style={styles.timeText}>{applicant.deliveryTime || '7 ngày'}</Text>
           </View>
         </View>
 
@@ -40,8 +41,8 @@ export const ApplicantCard = ({
         </View>
       </View>
 
-      {/* Proposal Cover Letter */}
-      <Text style={styles.coverLetterTitle}>Cover Letter:</Text>
+      {/* Proposal Thư giới thiệu */}
+      <Text style={styles.coverLetterTitle}>Thư giới thiệu:</Text>
       <Text style={styles.coverLetter} numberOfLines={3}>
         {applicant.coverLetter}
       </Text>
@@ -69,7 +70,7 @@ export const ApplicantCard = ({
             style={styles.actionBtn}
           />
           <CustomButton
-            title="Reject"
+            title="Từ chối"
             onPress={onReject}
             variant="danger"
             size="small"
@@ -78,7 +79,7 @@ export const ApplicantCard = ({
           />
           {onViewProfile && (
             <CustomButton
-              title="Profile"
+              title="Hồ sơ"
               onPress={onViewProfile}
               variant="outline"
               size="small"

@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { formatCurrency } from '../../utils/formatCurrency';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
-import UserAvatar from '../common/UserAvatar';
+import { UserAvatar } from '../common/UserAvatar';
 
 export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
   if (!user) return null;
@@ -24,7 +26,7 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
               </View>
             )}
           </View>
-          <Text style={styles.userTitle}>{user.title || (isFreelancer ? 'Freelancer' : 'Customer')}</Text>
+          <Text style={styles.userTitle}>{user.title || (isFreelancer ? 'Freelancer' : 'Khách hàng')}</Text>
 
           <View style={styles.roleBadgeContainer}>
             <View style={[styles.roleBadge, isFreelancer ? styles.freelancerBadge : styles.customerBadge]}>
@@ -34,14 +36,14 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
                 color={COLORS.white}
               />
               <Text style={styles.roleBadgeText}>
-                {isFreelancer ? 'Freelancer' : 'Customer (Hiring)'}
+                {isFreelancer ? 'Freelancer' : 'Khách hàng'}
               </Text>
             </View>
 
             {onSwitchRolePress && (
               <TouchableOpacity onPress={onSwitchRolePress} style={styles.switchRoleBtn}>
                 <Ionicons name="swap-horizontal" size={14} color={COLORS.primary} />
-                <Text style={styles.switchText}>Switch Role</Text>
+                <Text style={styles.switchText}>Đổi vai trò</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -54,19 +56,19 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
       <View style={styles.statsContainer}>
         <View style={styles.statBox}>
           <Text style={styles.statNumber}>{user.rating || '5.0'}</Text>
-          <Text style={styles.statLabel}>Rating ★</Text>
+          <Text style={styles.statLabel}>Đánh giá ★</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statBox}>
           <Text style={styles.statNumber}>{user.completedJobs || 0}</Text>
-          <Text style={styles.statLabel}>Completed</Text>
+          <Text style={styles.statLabel}>Hoàn thành</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statBox}>
           <Text style={styles.statNumber}>
-            {isFreelancer ? `$${user.hourlyRate || 50}/h` : `$${(user.totalSpent / 1000).toFixed(1)}k`}
+            {formatCurrency(isFreelancer ? user.hourlyRate : user.totalSpent, user.currency || 'VND')}
           </Text>
-          <Text style={styles.statLabel}>{isFreelancer ? 'Hourly Rate' : 'Total Spent'}</Text>
+          <Text style={styles.statLabel}>{isFreelancer ? 'Giá theo giờ' : 'Đã chi'}</Text>
         </View>
       </View>
     </View>

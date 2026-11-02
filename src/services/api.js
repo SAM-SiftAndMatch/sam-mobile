@@ -1,9 +1,9 @@
 // Axios Configuration for Future Backend Integration
-import axios from 'axios';
+import { create } from 'axios';
 import { CONFIG } from '../constants/config';
 
 // 1. Create Axios Instance
-const apiClient = axios.create({
+const apiClient = create({
   baseURL: CONFIG.API_BASE_URL,
   timeout: CONFIG.TIMEOUT,
   headers: {

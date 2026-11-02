@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
-import UserAvatar from '../common/UserAvatar';
-import StatusBadge from '../common/StatusBadge';
-import CustomButton from '../common/CustomButton';
+import { UserAvatar } from '../common/UserAvatar';
+import { StatusBadge } from '../common/StatusBadge';
+import { CustomButton } from '../common/CustomButton';
 
 export const JobCard = ({ job, onPress, onApplyPress, showApplyButton = false }) => {
   if (!job) return null;

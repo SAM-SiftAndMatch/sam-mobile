@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
-import { SIZES } from '../../constants/sizes';
 
 export const UserAvatar = ({
   uri,

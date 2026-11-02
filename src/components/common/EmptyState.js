@@ -1,14 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
-import CustomButton from './CustomButton';
+import { CustomButton } from './CustomButton';
 
 export const EmptyState = ({
   icon = 'search-outline',
-  title = 'No items found',
-  message = 'Try changing your search parameters or check back later.',
+  title = 'Chưa có dữ liệu',
+  message = 'Thử thay đổi bộ lọc hoặc quay lại sau.',
   actionTitle,
   onAction,
   style,

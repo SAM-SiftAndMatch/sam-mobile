@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { screenNavigation } from '../../navigation/navigation';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 
 export const Header = ({ title, showBack = false, onBackPress, rightIcon, onRightPress, subtitle }) => {
-  const navigation = useNavigation();
+  const navigation = screenNavigation;
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.headerContainer}>
@@ -49,6 +50,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backBtn: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingRight: 12,
   },
   title: {
@@ -62,6 +66,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   rightBtn: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 6,
   },
 });

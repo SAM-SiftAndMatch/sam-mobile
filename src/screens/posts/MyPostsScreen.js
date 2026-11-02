@@ -1,32 +1,26 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import StatusBadge from '../../components/common/StatusBadge';
-import CustomButton from '../../components/common/CustomButton';
-import EmptyState from '../../components/common/EmptyState';
+import { Header } from '../../components/common/Header';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { CustomButton } from '../../components/common/CustomButton';
+import { EmptyState } from '../../components/common/EmptyState';
 import { deleteJob } from '../../services/mockService';
 
 export const MyPostsScreen = ({ navigation }) => {
-  const { user } = useAuth();
-  const { jobs, refreshJobs } = useApp();
+  const { user, role } = useAuth();
+  const { jobs, applications, refreshJobs } = useApp();
 
   const [activeTab, setActiveTab] = useState('all'); // "all" | "open" | "draft" | "completed"
 
   const myPosts = jobs.filter(
-    (job) => job.customerId === user?.id
+    (job) => role === 'freelancer' ? applications.some(a => a.jobId === job.id && a.freelancerId === user?.id && a.status === 'accepted') : job.customerId === user?.id
   );
 
   const filteredPosts = myPosts.filter((post) => {
@@ -57,7 +51,7 @@ export const MyPostsScreen = ({ navigation }) => {
       <Header
         title="Dự án của tôi"
         subtitle={`${myPosts.length} dự án`}
-        rightIcon="add-circle-outline"
+        rightIcon={role === 'customer' ? 'add-circle-outline' : undefined}
         onRightPress={() => navigation.navigate('CreatePost')}
       />
 
@@ -102,6 +96,7 @@ export const MyPostsScreen = ({ navigation }) => {
 
             {/* Action Buttons Row */}
             <View style={styles.actionRow}>
+              {role === 'customer' && <>
               <CustomButton
                 title="Ứng viên"
                 onPress={() => navigation.navigate('Applications', { jobId: item.id })}
@@ -110,6 +105,7 @@ export const MyPostsScreen = ({ navigation }) => {
                 icon="people"
                 style={styles.actionBtn}
               />
+              </>}
               <CustomButton
                 title="Chi tiết"
                 onPress={() => navigation.navigate('JobDetail', { jobId: item.id })}
@@ -117,12 +113,12 @@ export const MyPostsScreen = ({ navigation }) => {
                 size="small"
                 style={styles.actionBtn}
               />
-              <TouchableOpacity
+              {role === 'customer' && item.status === 'draft' && <TouchableOpacity
                 onPress={() => handleDelete(item.id, item.title)}
                 style={styles.deleteBtn}
               >
                 <Ionicons name="trash-outline" size={18} color={COLORS.danger} />
-              </TouchableOpacity>
+              </TouchableOpacity>}
             </View>
           </View>
         )}
@@ -131,8 +127,8 @@ export const MyPostsScreen = ({ navigation }) => {
             icon="document-text-outline"
             title="Chưa có dự án"
             message="Bạn chưa có dự án nào ở trạng thái này."
-            actionTitle="Đăng dự án"
-            onAction={() => navigation.navigate('CreatePost')}
+            actionTitle={role === 'customer' ? 'Đăng dự án' : 'Tìm việc'}
+            onAction={() => navigation.navigate(role === 'customer' ? 'CreatePost' : 'Jobs')}
           />
         }
       />
@@ -156,6 +152,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tabBtn: {
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: SIZES.radiusSm,

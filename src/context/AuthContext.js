@@ -7,27 +7,22 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   // Default to first freelancer user for easy prototype preview
-  const [user, setUser] = useState(mockUsers[0]);
-  const [role, setRole] = useState(mockUsers[0].role);
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState('freelancer');
+  const [initializing, setInitializing] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
-    loadStoredAuth();
+    let active = true;
+    AsyncStorage.getItem('user_session').then(value => {
+      if (!active || !value) return;
+      const stored = JSON.parse(value);
+      setUser(stored);
+      setRole(stored.role || 'freelancer');
+    }).catch(() => {}).finally(() => { if (active) setInitializing(false); });
+    return () => { active = false; };
   }, []);
-
-  const loadStoredAuth = async () => {
-    try {
-      const storedUser = await AsyncStorage.getItem('user_session');
-      if (storedUser) {
-        const parsed = JSON.parse(storedUser);
-        setUser(parsed);
-        setRole(parsed.role || 'freelancer');
-      }
-    } catch (e) {
-      console.log('Error loading auth session from storage:', e);
-    }
-  };
 
   const login = async (email, password) => {
     setIsLoading(true);
@@ -99,6 +94,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        initializing,
         role,
         isLoading,
         authError,

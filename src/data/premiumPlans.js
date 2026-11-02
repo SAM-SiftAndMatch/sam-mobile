@@ -1,51 +1,6 @@
-// Mock Premium Subscription Plans
+// Sample catalogue for the mobile design preview. Prices must come from the API in production.
 export const mockPremiumPlans = [
-  {
-    id: "plan_free",
-    name: "FREE",
-    price: 0,
-    period: "Forever Free",
-    description: "Essential job browsing & standard proposal submissions.",
-    popular: false,
-    badgeColor: "#64748B",
-    features: [
-      "Basic job browsing & search",
-      "Apply up to 5 jobs per month",
-      "Standard client response time",
-      "Basic profile visibility"
-    ]
-  },
-  {
-    id: "plan_pro",
-    name: "PRO",
-    price: 19,
-    period: "per month",
-    description: "Boost your profile visibility and double your applications.",
-    popular: true,
-    badgeColor: "#4F46E5",
-    features: [
-      "Apply up to 30 jobs per month",
-      "Highlighted proposal badge",
-      "Profile boost in category search",
-      "Advanced salary & budget insights",
-      "Instant email & push notifications"
-    ]
-  },
-  {
-    id: "plan_premium",
-    name: "PREMIUM",
-    price: 49,
-    period: "per month",
-    description: "Maximum visibility, unlimited applications, & priority client matching.",
-    popular: false,
-    badgeColor: "#10B981",
-    features: [
-      "Unlimited job applications",
-      "Top-tier Featured Profile tag",
-      "Priority visibility to active customers",
-      "Dedicated account manager support",
-      "Advanced analytics & application tracking",
-      "Verified Pro badge on profile"
-    ]
-  }
+  { id: 'plan_free', name: 'BASE', price: 0, currency: 'VND', period: 'miễn phí', description: 'Bắt đầu kết nối và quản lý dự án.', popular: false, badgeColor: '#64748B', features: ['Tìm kiếm dự án', 'Gửi đề xuất và trao đổi', 'Theo dõi các dự án của bạn'] },
+  { id: 'plan_pro', name: 'PRO DEV', price: 149000, currency: 'VND', period: 'tháng', description: 'Gói dành cho Freelancer.', popular: true, badgeColor: '#1D4ED8', features: ['Tiếp cận dự án tuyển gấp', 'AI Job Matcher và Instant Claim', 'Smart Scope Shield'] },
+  { id: 'plan_premium', name: 'BUSINESS', price: 249000, currency: 'VND', period: 'tháng', description: 'Gói dành cho khách hàng và doanh nghiệp.', popular: false, badgeColor: '#0369A1', features: ['Đăng dự án nổi bật', 'Tuyển gấp với AI Headhunter', 'Quản lý dự án tập trung'] }
 ];

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 
@@ -90,6 +91,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: SIZES.body2,
+    fontFamily: 'BeVietnamPro_400Regular',
     fontWeight: '600',
     color: COLORS.textPrimary,
     marginBottom: 6,
@@ -123,6 +125,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: SIZES.body2,
+    fontFamily: 'BeVietnamPro_400Regular',
     color: COLORS.textPrimary,
     paddingVertical: 8,
   },

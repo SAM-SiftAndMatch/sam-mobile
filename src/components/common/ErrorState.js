@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
-import CustomButton from './CustomButton';
+import { CustomButton } from './CustomButton';
 
 export const ErrorState = ({
   title = 'Something went wrong',
@@ -18,7 +19,7 @@ export const ErrorState = ({
       <Text style={styles.message}>{message}</Text>
       {onRetry && (
         <CustomButton
-          title="Try Again"
+          title="Thử lại"
           onPress={onRetry}
           variant="outline"
           size="medium"

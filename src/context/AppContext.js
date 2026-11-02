@@ -14,6 +14,7 @@ import {
   markConversationRead,
 } from '../services/mockService';
 import { conversationUnread } from '../services/projectChatStore';
+import { router } from 'expo-router';
 import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
@@ -66,7 +67,7 @@ export const AppProvider = ({ children }) => {
   const chatUnreadCount = visibleConversations.reduce((sum, room) => sum + conversationUnread(room, user?.id), 0);
   const openMessages = (applicationId) => {
     const room = applicationId ? visibleConversations.find((item) => item.application.id === applicationId) : null;
-    setChatView({ userId: user?.id, roomId: room?.id || null });
+    router.push(room ? { pathname: '/workspace', params: { roomId: room.id } } : '/messages');
   };
   const closeMessages = () => setChatView(null);
   const selectConversation = (roomId) => {
@@ -118,8 +119,8 @@ export const AppProvider = ({ children }) => {
       const data = await getJobs(filters);
       setJobs(data);
       setLoading(false);
-    } catch (err) {
-      setError('Failed to refresh jobs');
+    } catch {
+      setError('Không thể tải dự án');
       setLoading(false);
     }
   };
@@ -182,7 +183,7 @@ export const AppProvider = ({ children }) => {
       setConversations(rooms);
       if (status === 'accepted') {
         const room = rooms.find((item) => item.application.id === id);
-        if (room) setChatView({ userId: user.id, roomId: room.id });
+        if (room) router.push({ pathname: '/workspace', params: { roomId: room.id } });
       }
       setLoading(false);
       return updated;
