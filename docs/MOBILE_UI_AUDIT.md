@@ -41,4 +41,4 @@ Kiểm tra kỹ thuật: lint sạch, typecheck đạt, 2 bộ kiểm thử hi�
 
 Cần kiểm tra thêm trên thiết bị hoặc simulator native: bàn phím thật, safe area/notch, cử chỉ quay lại, VoiceOver/TalkBack và Dynamic Type. Export bundle Android xác nhận đóng gói JavaScript, không thay thế các bước này.
 
-Mobile vẫn dùng mockService. Timeline, hợp đồng, thanh toán và nghiệm thu chưa tương đương nghiệp vụ của web/backend; phần này được theo dõi trong [MOBILE_REDESIGN.md](MOBILE_REDESIGN.md).
+Mobile vẫn dùng mock repository. Timeline, hợp đồng, thanh toán và nghiệm thu chưa tương đương nghiệp vụ của web/backend; phần này được theo dõi trong [MOBILE_REDESIGN.md](MOBILE_REDESIGN.md).

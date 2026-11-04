@@ -1,8 +1,4 @@
 // Spacing, Typography Sizes, and Layout Constants
-import { Dimensions } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
-
 export const SIZES = {
   // Global spacing
   base: 8,
@@ -25,10 +21,6 @@ export const SIZES = {
   body3: 13,
   caption: 12,
   tiny: 12,
-
-  // Screen dimensions
-  width,
-  height,
 };
 
 export const SHADOWS = {

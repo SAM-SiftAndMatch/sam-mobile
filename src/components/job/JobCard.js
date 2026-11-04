@@ -13,11 +13,7 @@ export const JobCard = ({ job, onPress, onApplyPress, showApplyButton = false })
   if (!job) return null;
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      onPress={onPress}
-      style={styles.cardContainer}
-    >
+    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.cardContainer}>
       {/* Top Header: Customer Info & Status */}
       <View style={styles.topRow}>
         <View style={styles.customerInfo}>

@@ -6,6 +6,7 @@ import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 import { CustomButton } from './CustomButton';
 
+/** @param {import('./types').EmptyStateProps} props */
 export const EmptyState = ({
   icon = 'search-outline',
   title = 'Chưa có dữ liệu',

@@ -6,6 +6,7 @@ import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 import { CustomButton } from './CustomButton';
 
+/** @param {import('./types').ErrorStateProps} props */
 export const ErrorState = ({
   title = 'Something went wrong',
   message = 'Unable to fetch requested data. Please try again.',

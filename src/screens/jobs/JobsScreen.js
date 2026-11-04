@@ -1,10 +1,11 @@
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
+import { selectOpenJobs } from '../../features/marketplace/model/selectors';
 import React from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 import { Header } from '../../components/common/Header';
 import { SearchBar } from '../../components/common/SearchBar';
 import { JobCard } from '../../components/job/JobCard';
@@ -22,32 +23,18 @@ export const JobsScreen = ({ navigation }) => {
     selectedCategory,
     setSelectedCategory,
     refreshJobs,
-  } = useApp();
-
+  } = useMarketplace();
 
   const isFreelancer = role === 'freelancer';
 
-  // Apply filters
-  const filteredJobs = jobs.filter((job) => {
-    if (job.status !== 'open') return false;
-    const matchesCategory =
-      selectedCategory === 'All' || job.category === selectedCategory;
-
-    const matchesSearch =
-      !searchQuery ||
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    return matchesCategory && matchesSearch;
-  });
+  const filteredJobs = selectOpenJobs(jobs, searchQuery, selectedCategory);
 
   return (
     <View style={styles.container}>
       <Header
         title="Khám phá dự án"
         subtitle={`${filteredJobs.length} dự án`}
-        rightIcon={!isFreelancer ? "add-circle-outline" : undefined}
+        rightIcon={!isFreelancer ? 'add-circle-outline' : undefined}
         onRightPress={!isFreelancer ? () => navigation.navigate('CreatePost') : undefined}
       />
 
@@ -67,17 +54,9 @@ export const JobsScreen = ({ navigation }) => {
         >
           <TouchableOpacity
             onPress={() => setSelectedCategory('All')}
-            style={[
-              styles.pill,
-              selectedCategory === 'All' && styles.selectedPill,
-            ]}
+            style={[styles.pill, selectedCategory === 'All' && styles.selectedPill]}
           >
-            <Text
-              style={[
-                styles.pillText,
-                selectedCategory === 'All' && styles.selectedPillText,
-              ]}
-            >
+            <Text style={[styles.pillText, selectedCategory === 'All' && styles.selectedPillText]}>
               Tất cả
             </Text>
           </TouchableOpacity>
@@ -85,24 +64,16 @@ export const JobsScreen = ({ navigation }) => {
             <TouchableOpacity
               key={cat.id}
               onPress={() => setSelectedCategory(cat.name)}
-              style={[
-                styles.pill,
-                selectedCategory === cat.name && styles.selectedPill,
-              ]}
+              style={[styles.pill, selectedCategory === cat.name && styles.selectedPill]}
             >
               <Text
-                style={[
-                  styles.pillText,
-                  selectedCategory === cat.name && styles.selectedPillText,
-                ]}
+                style={[styles.pillText, selectedCategory === cat.name && styles.selectedPillText]}
               >
                 {cat.name}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
-
-
       </View>
 
       {/* Main Job FlatList */}
@@ -181,40 +152,6 @@ const styles = StyleSheet.create({
   selectedPillText: {
     color: COLORS.white,
     fontWeight: '700',
-  },
-  statusFilterRow: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  statusFilterLabel: {
-    fontSize: SIZES.caption,
-    color: COLORS.textMuted,
-    fontWeight: '700',
-  },
-  statusPill: {
-    minHeight: 44,
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 6,
-    backgroundColor: COLORS.surface,
-  },
-  selectedStatusPill: {
-    backgroundColor: COLORS.primaryBackground,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-  },
-  statusPillText: {
-    fontSize: SIZES.tiny,
-    color: COLORS.textMuted,
-    fontWeight: '700',
-  },
-  selectedStatusPillText: {
-    color: COLORS.primary,
   },
   listContent: {
     padding: SIZES.padding,

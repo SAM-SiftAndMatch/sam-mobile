@@ -64,8 +64,14 @@ export const CustomInput = ({
           keyboardType={keyboardType}
           multiline={multiline}
           numberOfLines={multiline ? numberOfLines : 1}
-          onFocus={(event) => { setIsFocused(true); onFocus?.(event); }}
-          onBlur={(event) => { setIsFocused(false); onBlur?.(event); }}
+          onFocus={(event) => {
+            setIsFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            onBlur?.(event);
+          }}
           style={[
             styles.textInput,
             multiline && { textAlignVertical: 'top', minHeight: 80 },
@@ -89,7 +95,11 @@ export const CustomInput = ({
         )}
       </View>
 
-      {error ? <Text accessibilityLiveRegion="polite" style={styles.errorText}>{error}</Text> : null}
+      {error ? (
+        <Text accessibilityLiveRegion="polite" style={styles.errorText}>
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 };

@@ -7,14 +7,28 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 
-export const Header = ({ title, showBack = false, onBackPress, rightIcon, onRightPress, subtitle, rightAccessibilityLabel }) => {
+/** @param {import('./types').HeaderProps} props */
+export const Header = ({
+  title,
+  showBack = false,
+  onBackPress,
+  rightIcon,
+  onRightPress,
+  subtitle,
+  rightAccessibilityLabel,
+}) => {
   const navigation = screenNavigation;
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.headerContainer}>
       <View style={styles.leftRow}>
         {showBack && (
-          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quay lại" onPress={onBackPress || (() => navigation.goBack())} style={styles.backBtn}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Quay lại"
+            onPress={onBackPress || (() => navigation.goBack())}
+            style={styles.backBtn}
+          >
             <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
           </TouchableOpacity>
         )}
@@ -25,7 +39,20 @@ export const Header = ({ title, showBack = false, onBackPress, rightIcon, onRigh
       </View>
 
       {rightIcon && onRightPress && (
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel={rightAccessibilityLabel || ({ 'add-circle-outline': 'Tạo dự án', 'chatbubbles-outline': 'Mở tin nhắn', 'log-out-outline': 'Đăng xuất' }[rightIcon] || 'Tùy chọn')} onPress={onRightPress} style={styles.rightBtn}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={
+            rightAccessibilityLabel ||
+            {
+              'add-circle-outline': 'Tạo dự án',
+              'chatbubbles-outline': 'Mở tin nhắn',
+              'log-out-outline': 'Đăng xuất',
+            }[rightIcon] ||
+            'Tùy chọn'
+          }
+          onPress={onRightPress}
+          style={styles.rightBtn}
+        >
           <Ionicons name={rightIcon} size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
       )}

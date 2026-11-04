@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
 import Text from '../../design/Text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
@@ -7,7 +15,7 @@ import { SIZES } from '../../constants/sizes';
 import { validateEmail, validatePassword, validateRequired } from '../../utils/validation';
 import { CustomInput } from '../../components/common/CustomInput';
 import { CustomButton } from '../../components/common/CustomButton';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 
 export const RegisterScreen = ({ navigation }) => {
   const { register, isLoading } = useAuth();
@@ -57,11 +65,13 @@ export const RegisterScreen = ({ navigation }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quay lại" onPress={() => navigation.goBack()} style={styles.backBtn}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Quay lại"
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
           <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
 
@@ -74,10 +84,7 @@ export const RegisterScreen = ({ navigation }) => {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => setRole('freelancer')}
-            style={[
-              styles.roleCard,
-              role === 'freelancer' && styles.selectedRoleCard,
-            ]}
+            style={[styles.roleCard, role === 'freelancer' && styles.selectedRoleCard]}
           >
             <View
               style={[
@@ -91,20 +98,10 @@ export const RegisterScreen = ({ navigation }) => {
                 color={role === 'freelancer' ? COLORS.white : COLORS.primary}
               />
             </View>
-            <Text
-              style={[
-                styles.roleTitle,
-                role === 'freelancer' && styles.selectedRoleText,
-              ]}
-            >
+            <Text style={[styles.roleTitle, role === 'freelancer' && styles.selectedRoleText]}>
               Freelancer
             </Text>
-            <Text
-              style={[
-                styles.roleSub,
-                role === 'freelancer' && styles.selectedRoleSub,
-              ]}
-            >
+            <Text style={[styles.roleSub, role === 'freelancer' && styles.selectedRoleSub]}>
               Tìm việc và thực hiện dự án
             </Text>
           </TouchableOpacity>
@@ -112,10 +109,7 @@ export const RegisterScreen = ({ navigation }) => {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => setRole('customer')}
-            style={[
-              styles.roleCard,
-              role === 'customer' && styles.selectedRoleCardCustomer,
-            ]}
+            style={[styles.roleCard, role === 'customer' && styles.selectedRoleCardCustomer]}
           >
             <View
               style={[
@@ -129,20 +123,10 @@ export const RegisterScreen = ({ navigation }) => {
                 color={role === 'customer' ? COLORS.white : COLORS.customerBadge}
               />
             </View>
-            <Text
-              style={[
-                styles.roleTitle,
-                role === 'customer' && styles.selectedRoleText,
-              ]}
-            >
+            <Text style={[styles.roleTitle, role === 'customer' && styles.selectedRoleText]}>
               Khách hàng
             </Text>
-            <Text
-              style={[
-                styles.roleSub,
-                role === 'customer' && styles.selectedRoleSub,
-              ]}
-            >
+            <Text style={[styles.roleSub, role === 'customer' && styles.selectedRoleSub]}>
               Đăng dự án và tìm chuyên gia
             </Text>
           </TouchableOpacity>
@@ -208,7 +192,11 @@ export const RegisterScreen = ({ navigation }) => {
 
         <View style={styles.footerRow}>
           <Text style={styles.footerText}>Bạn đã có tài khoản? </Text>
-          <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            style={{ minHeight: 44, justifyContent: 'center' }}
+            onPress={() => navigation.navigate('Login')}
+          >
             <Text style={styles.loginLink}>Đăng nhập</Text>
           </TouchableOpacity>
         </View>

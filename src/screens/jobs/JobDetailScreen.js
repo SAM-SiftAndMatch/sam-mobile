@@ -1,3 +1,5 @@
+import { useChat } from '../../features/chat/useChat';
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, StyleSheet, ScrollView, Alert, useWindowDimensions } from 'react-native';
@@ -6,8 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 import { Header } from '../../components/common/Header';
 import { UserAvatar } from '../../components/common/UserAvatar';
 import { StatusBadge } from '../../components/common/StatusBadge';
@@ -20,9 +21,10 @@ export const JobDetailScreen = ({ route, navigation }) => {
   const insets = useSafeAreaInsets();
   const { jobId } = route.params || {};
   const { user, role } = useAuth();
-  const { jobs, applications, openMessages } = useApp();
+  const { jobs, applications } = useMarketplace();
+  const { openMessages } = useChat();
 
-  const job = jobs.find(j => j.id === jobId);
+  const job = jobs.find((j) => j.id === jobId);
 
   if (!job) {
     return (
@@ -38,14 +40,18 @@ export const JobDetailScreen = ({ route, navigation }) => {
 
   // Check if current freelancer has already applied
   const existingApp = applications.find(
-    (app) => app.jobId === job.id && app.freelancerId === user?.id
+    (app) => app.jobId === job.id && app.freelancerId === user?.id,
   );
 
   return (
     <View style={styles.container}>
       <Header title="Chi tiết dự án" showBack />
 
-      <ScrollView style={compact ? { width: '100%' } : { flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={compact ? { width: '100%' } : { flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Main Job Overview Card */}
         <View style={styles.card}>
           <View style={styles.categoryRow}>
@@ -131,7 +137,18 @@ export const JobDetailScreen = ({ route, navigation }) => {
       {/* Bottom Sticky Action Footer */}
       <View style={[styles.footerBar, { paddingBottom: Math.max(14, insets.bottom) }]}>
         {job.status === 'in_progress' && (isOwner || existingApp?.status === 'accepted') ? (
-          <CustomButton title="Mở chat dự án" icon="chatbubbles-outline" onPress={() => openMessages((existingApp || applications.find((app) => app.jobId === job.id && app.status === 'accepted'))?.id)} />
+          <CustomButton
+            title="Mở chat dự án"
+            icon="chatbubbles-outline"
+            onPress={() =>
+              openMessages(
+                (
+                  existingApp ||
+                  applications.find((app) => app.jobId === job.id && app.status === 'accepted')
+                )?.id,
+              )
+            }
+          />
         ) : isFreelancer ? (
           existingApp ? (
             <View style={styles.appliedBanner}>
@@ -152,7 +169,12 @@ export const JobDetailScreen = ({ route, navigation }) => {
             />
           )
         ) : (
-          <View style={[styles.customerActionRow, compact && { flexDirection: 'column', alignItems: 'stretch' }]}>
+          <View
+            style={[
+              styles.customerActionRow,
+              compact && { flexDirection: 'column', alignItems: 'stretch' },
+            ]}
+          >
             <CustomButton
               title="Xem ứng viên"
               onPress={() => navigation.navigate('Applications', { jobId: job.id })}
@@ -165,7 +187,9 @@ export const JobDetailScreen = ({ route, navigation }) => {
               <CustomButton
                 title="Chỉnh sửa"
                 style={compact ? { width: '100%' } : undefined}
-                onPress={() => Alert.alert('Chỉnh sửa dự án', 'Chức năng chỉnh sửa đang được phát triển.')}
+                onPress={() =>
+                  Alert.alert('Chỉnh sửa dự án', 'Chức năng chỉnh sửa đang được phát triển.')
+                }
                 variant="outline"
                 size="large"
                 icon="create-outline"

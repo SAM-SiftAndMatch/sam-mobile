@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import Text from '../../design/Text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
-import { getPremiumPlans } from '../../services/mockService';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { useSubscriptions } from '../../features/subscriptions/SubscriptionsProvider';
+import { ErrorState } from '../../components/common/ErrorState';
 import { Header } from '../../components/common/Header';
 import { PremiumCard } from '../../components/premium/PremiumCard';
 import { LoadingState } from '../../components/common/LoadingState';
@@ -13,15 +14,7 @@ import { LoadingState } from '../../components/common/LoadingState';
 export const PremiumScreen = ({ navigation }) => {
   const { user } = useAuth();
 
-  const [plans, setPlans] = useState([]);
-  const [fetching, setFetching] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    getPremiumPlans().then(data => { if (active) setPlans(data); })
-      .finally(() => { if (active) setFetching(false); });
-    return () => { active = false; };
-  }, []);
+  const { plans, loading: fetching, error, refreshPlans } = useSubscriptions();
 
   const handleSelectPlan = (plan) => {
     if (plan.id === 'plan_free') {
@@ -35,6 +28,7 @@ export const PremiumScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header title="SAM Premium" showBack />
 
+      {error && <ErrorState message={error} onRetry={() => void refreshPlans().catch(() => {})} />}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.heroSection}>
           <View style={styles.badgeCircle}>

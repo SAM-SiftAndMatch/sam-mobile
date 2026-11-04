@@ -26,18 +26,23 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
               </View>
             )}
           </View>
-          <Text style={styles.userTitle}>{user.title || (isFreelancer ? 'Freelancer' : 'Khách hàng')}</Text>
+          <Text style={styles.userTitle}>
+            {user.title || (isFreelancer ? 'Freelancer' : 'Khách hàng')}
+          </Text>
 
           <View style={styles.roleBadgeContainer}>
-            <View style={[styles.roleBadge, isFreelancer ? styles.freelancerBadge : styles.customerBadge]}>
+            <View
+              style={[
+                styles.roleBadge,
+                isFreelancer ? styles.freelancerBadge : styles.customerBadge,
+              ]}
+            >
               <Ionicons
                 name={isFreelancer ? 'briefcase-outline' : 'business-outline'}
                 size={12}
                 color={COLORS.white}
               />
-              <Text style={styles.roleBadgeText}>
-                {isFreelancer ? 'Freelancer' : 'Khách hàng'}
-              </Text>
+              <Text style={styles.roleBadgeText}>{isFreelancer ? 'Freelancer' : 'Khách hàng'}</Text>
             </View>
 
             {onSwitchRolePress && (
@@ -64,7 +69,10 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
         </View>
         <View style={[styles.statBox, styles.moneyStat]}>
           <Text style={styles.statNumber}>
-            {formatCurrency(isFreelancer ? user.hourlyRate : user.totalSpent, user.currency || 'VND')}
+            {formatCurrency(
+              isFreelancer ? user.hourlyRate : user.totalSpent,
+              user.currency || 'VND',
+            )}
           </Text>
           <Text style={styles.statLabel}>{isFreelancer ? 'Giá theo giờ' : 'Đã chi'}</Text>
         </View>
@@ -184,7 +192,12 @@ const styles = StyleSheet.create({
     minWidth: 0,
     alignItems: 'center',
   },
-  moneyStat: { flexBasis: '100%', paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.border },
+  moneyStat: {
+    flexBasis: '100%',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
   statNumber: {
     textAlign: 'center',
     fontSize: SIZES.h4,
@@ -195,11 +208,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.tiny,
     color: COLORS.textMuted,
     marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    height: 24,
-    backgroundColor: COLORS.border,
   },
 });
 

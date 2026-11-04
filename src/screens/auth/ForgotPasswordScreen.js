@@ -37,9 +37,7 @@ export const ForgotPasswordScreen = ({ navigation }) => {
         <View style={styles.successBox}>
           <Ionicons name="checkmark-circle" size={54} color={COLORS.success} />
           <Text style={styles.successTitle}>Yêu cầu đã được ghi nhận</Text>
-          <Text style={styles.successText}>
-            Yêu cầu khôi phục cho {email}.
-          </Text>
+          <Text style={styles.successText}>Yêu cầu khôi phục cho {email}.</Text>
           <CustomButton
             title="Quay lại đăng nhập"
             onPress={() => navigation.navigate('Login')}

@@ -1,3 +1,5 @@
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
+import { selectUserProjects } from '../../features/marketplace/model/selectors';
 import React, { useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import Text from '../../design/Text';
@@ -5,23 +7,19 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 import { Header } from '../../components/common/Header';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { CustomButton } from '../../components/common/CustomButton';
 import { EmptyState } from '../../components/common/EmptyState';
-import { deleteJob } from '../../services/mockService';
 
 export const MyPostsScreen = ({ navigation }) => {
   const { user, role } = useAuth();
-  const { jobs, applications, refreshJobs } = useApp();
+  const { jobs, applications, deleteJob } = useMarketplace();
 
   const [activeTab, setActiveTab] = useState('all'); // "all" | "open" | "draft" | "completed"
 
-  const myPosts = jobs.filter(
-    (job) => role === 'freelancer' ? applications.some(a => a.jobId === job.id && a.freelancerId === user?.id && a.status === 'accepted') : job.customerId === user?.id
-  );
+  const myPosts = selectUserProjects(jobs, applications, user);
 
   const filteredPosts = myPosts.filter((post) => {
     if (activeTab === 'all') return true;
@@ -29,21 +27,20 @@ export const MyPostsScreen = ({ navigation }) => {
   });
 
   const handleDelete = (id, title) => {
-    Alert.alert(
-      'Xóa dự án',
-      `Bạn có chắc muốn xóa "${title}"?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Xóa',
-          style: 'destructive',
-          onPress: async () => {
+    Alert.alert('Xóa dự án', `Bạn có chắc muốn xóa "${title}"?`, [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Xóa',
+        style: 'destructive',
+        onPress: async () => {
+          try {
             await deleteJob(id);
-            refreshJobs();
-          },
+          } catch (error) {
+            Alert.alert('Không thể xóa dự án', error.message);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -64,7 +61,15 @@ export const MyPostsScreen = ({ navigation }) => {
             style={[styles.tabBtn, activeTab === tab && styles.activeTabBtn]}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {{ all: 'Tất cả', open: 'Đang tuyển', in_progress: 'Đang làm', draft: 'Bản nháp', completed: 'Hoàn thành' }[tab]}
+              {
+                {
+                  all: 'Tất cả',
+                  open: 'Đang tuyển',
+                  in_progress: 'Đang làm',
+                  draft: 'Bản nháp',
+                  completed: 'Hoàn thành',
+                }[tab]
+              }
             </Text>
           </TouchableOpacity>
         ))}
@@ -88,24 +93,24 @@ export const MyPostsScreen = ({ navigation }) => {
               <Text style={styles.budget}>{formatCurrency(item.budget, item.currency)}</Text>
               <View style={styles.applicantBadge}>
                 <Ionicons name="people-outline" size={14} color={COLORS.primary} />
-                <Text style={styles.applicantText}>
-                  {item.applicationsCount || 0} ứng viên
-                </Text>
+                <Text style={styles.applicantText}>{item.applicationsCount || 0} ứng viên</Text>
               </View>
             </View>
 
             {/* Action Buttons Row */}
             <View style={styles.actionRow}>
-              {role === 'customer' && <>
-              <CustomButton
-                title="Ứng viên"
-                onPress={() => navigation.navigate('Applications', { jobId: item.id })}
-                variant="primary"
-                size="small"
-                icon="people"
-                style={styles.actionBtn}
-              />
-              </>}
+              {role === 'customer' && (
+                <>
+                  <CustomButton
+                    title="Ứng viên"
+                    onPress={() => navigation.navigate('Applications', { jobId: item.id })}
+                    variant="primary"
+                    size="small"
+                    icon="people"
+                    style={styles.actionBtn}
+                  />
+                </>
+              )}
               <CustomButton
                 title="Chi tiết"
                 onPress={() => navigation.navigate('JobDetail', { jobId: item.id })}
@@ -113,12 +118,14 @@ export const MyPostsScreen = ({ navigation }) => {
                 size="small"
                 style={styles.actionBtn}
               />
-              {role === 'customer' && item.status === 'draft' && <TouchableOpacity
-                onPress={() => handleDelete(item.id, item.title)}
-                style={styles.deleteBtn}
-              >
-                <Ionicons name="trash-outline" size={18} color={COLORS.danger} />
-              </TouchableOpacity>}
+              {role === 'customer' && item.status === 'draft' && (
+                <TouchableOpacity
+                  onPress={() => handleDelete(item.id, item.title)}
+                  style={styles.deleteBtn}
+                >
+                  <Ionicons name="trash-outline" size={18} color={COLORS.danger} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}

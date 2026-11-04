@@ -1,16 +1,18 @@
+import { useNotifications } from '../../features/notifications/NotificationsProvider';
 import React from 'react';
+import { ErrorState } from '../../components/common/ErrorState';
+import { LoadingState } from '../../components/common/LoadingState';
 import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import Text from '../../design/Text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatDate } from '../../utils/formatCurrency';
-import { useApp } from '../../context/AppContext';
 import { Header } from '../../components/common/Header';
 import { EmptyState } from '../../components/common/EmptyState';
 
 export const NotificationsScreen = ({ navigation }) => {
-  const { notifications, markRead } = useApp();
+  const { notifications, markRead, loading, error, refreshNotifications } = useNotifications();
 
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -31,6 +33,9 @@ export const NotificationsScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header title="Thông báo" showBack />
 
+      {error && (
+        <ErrorState message={error} onRetry={() => void refreshNotifications().catch(() => {})} />
+      )}
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}
@@ -42,11 +47,8 @@ export const NotificationsScreen = ({ navigation }) => {
           return (
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => markRead(item.id)}
-              style={[
-                styles.notifCard,
-                !item.isRead && styles.unreadCard,
-              ]}
+              onPress={() => void markRead(item.id).catch(() => {})}
+              style={[styles.notifCard, !item.isRead && styles.unreadCard]}
             >
               <View style={[styles.iconBox, { backgroundColor: iconConfig.bg }]}>
                 <Ionicons name={iconConfig.icon} size={22} color={iconConfig.color} />
@@ -64,11 +66,15 @@ export const NotificationsScreen = ({ navigation }) => {
           );
         }}
         ListEmptyComponent={
-          <EmptyState
-            icon="notifications-off-outline"
-            title="Chưa có thông báo"
-            message="Thông báo về dự án và tài khoản sẽ xuất hiện tại đây."
-          />
+          loading ? (
+            <LoadingState />
+          ) : (
+            <EmptyState
+              icon="notifications-off-outline"
+              title="Chưa có thông báo"
+              message="Thông báo về dự án và tài khoản sẽ xuất hiện tại đây."
+            />
+          )
         }
       />
     </View>

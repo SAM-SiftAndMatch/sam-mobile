@@ -1,3 +1,4 @@
+import { useSubscriptions } from '../../features/subscriptions/SubscriptionsProvider';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
@@ -6,16 +7,15 @@ import Text from '../../design/Text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
+import { ErrorState } from '../../components/common/ErrorState';
 import { Header } from '../../components/common/Header';
 import { CustomButton } from '../../components/common/CustomButton';
 
 export const PremiumPlanDetailScreen = ({ route, navigation }) => {
   const insets = useSafeAreaInsets();
   const { plan } = route.params || {};
-  const { updateProfile } = useAuth();
-  const { subscribeToPlan, loading } = useApp();
+
+  const { subscribeToPlan, subscribing: loading, error } = useSubscriptions();
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -24,10 +24,9 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
   const handleConfirmSubscribe = async () => {
     try {
       await subscribeToPlan(plan.id);
-      await updateProfile({ isPremium: true, premiumPlan: plan.name });
       setShowSuccessModal(true);
-    } catch (err) {
-      console.log('Subscribe error:', err);
+    } catch {
+      // The subscription provider exposes this failure in the error state above the form.
     }
   };
 
@@ -35,13 +34,15 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <Header title={`Gói ${plan.name}`} showBack />
 
+      {error && <ErrorState message={error} />}
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent}>
         <View style={styles.planHeaderCard}>
           <View style={[styles.badge, { backgroundColor: plan.badgeColor || COLORS.primary }]}>
             <Text style={styles.badgeText}>{plan.name}</Text>
           </View>
           <Text style={styles.price}>
-            {formatCurrency(plan.price, plan.currency)} <Text style={styles.period}>/{plan.period}</Text>
+            {formatCurrency(plan.price, plan.currency)}{' '}
+            <Text style={styles.period}>/{plan.period}</Text>
           </Text>
           <Text style={styles.description}>{plan.description}</Text>
         </View>
@@ -81,9 +82,7 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
           <View style={styles.modalContent}>
             <Ionicons name="checkmark-circle" size={72} color={COLORS.success} />
             <Text style={styles.modalTitle}>Đã kích hoạt gói mẫu</Text>
-            <Text style={styles.modalSub}>
-              Tài khoản mẫu của bạn đã sử dụng gói {plan.name}.
-            </Text>
+            <Text style={styles.modalSub}>Tài khoản mẫu của bạn đã sử dụng gói {plan.name}.</Text>
 
             <CustomButton
               title="Về tổng quan"

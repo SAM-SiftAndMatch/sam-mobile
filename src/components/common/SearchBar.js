@@ -25,12 +25,22 @@ export const SearchBar = ({
         style={styles.input}
       />
       {value ? (
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Xóa tìm kiếm" onPress={() => onChangeText('')} style={styles.clearBtn}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Xóa tìm kiếm"
+          onPress={() => onChangeText('')}
+          style={styles.clearBtn}
+        >
           <Ionicons name="close-circle" size={18} color={COLORS.textMuted} />
         </TouchableOpacity>
       ) : null}
       {onFilterPress && (
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Bộ lọc tìm kiếm" onPress={onFilterPress} style={styles.filterBtn}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Bộ lọc tìm kiếm"
+          onPress={onFilterPress}
+          style={styles.filterBtn}
+        >
           <Ionicons name="options-outline" size={20} color={COLORS.primary} />
         </TouchableOpacity>
       )}

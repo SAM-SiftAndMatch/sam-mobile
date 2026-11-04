@@ -67,19 +67,33 @@ export const CustomButton = ({
       onPress={onPress}
       disabled={disabled || loading}
       accessibilityRole="button"
+      accessibilityLabel={title}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[getContainerStyle(), style]}
     >
       {loading ? (
-        <ActivityIndicator color={['outline', 'ghost'].includes(variant) ? COLORS.primary : COLORS.white} size="small" />
+        <ActivityIndicator
+          color={['outline', 'ghost'].includes(variant) ? COLORS.primary : COLORS.white}
+          size="small"
+        />
       ) : (
         <View style={styles.contentRow}>
           {icon && iconPosition === 'left' && (
-            <Ionicons name={icon} size={size === 'small' ? 16 : 20} color={getIconColor()} style={{ marginRight: 6 }} />
+            <Ionicons
+              name={icon}
+              size={size === 'small' ? 16 : 20}
+              color={getIconColor()}
+              style={{ marginRight: 6 }}
+            />
           )}
           <Text style={[getTextStyle(), textStyle]}>{title}</Text>
           {icon && iconPosition === 'right' && (
-            <Ionicons name={icon} size={size === 'small' ? 16 : 20} color={getIconColor()} style={{ marginLeft: 6 }} />
+            <Ionicons
+              name={icon}
+              size={size === 'small' ? 16 : 20}
+              color={getIconColor()}
+              style={{ marginLeft: 6 }}
+            />
           )}
         </View>
       )}

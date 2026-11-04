@@ -27,7 +27,7 @@ Nguồn đối chiếu: `sam-fe/src/index.css`, `AppHeader.tsx`, `JobStatusBadge
 
 ## Phần tích hợp nghiệp vụ còn lại
 
-Ứng dụng hiện vẫn dùng `mockService`; bản này thực hiện tái thiết kế và chuyển đổi điều hướng, chưa hoàn tất plan tích hợp backend. Dữ liệu mock được ghi rõ tại lớp service; giá gói mẫu cần lấy từ API khi triển khai thật.
+Ứng dụng hiện vẫn dùng `services/mock/service.js` qua repository; bản này thực hiện tái thiết kế và chuyển đổi điều hướng, chưa hoàn tất plan tích hợp backend. Dữ liệu mock được ghi rõ tại lớp service; giá gói mẫu cần lấy từ API khi triển khai thật.
 
 1. Auth API, refresh/session trên thiết bị, profile, danh sách và bộ lọc phân trang.
 2. Draft có revision và tự lưu; AI BA → duyệt SRS → Risk → xác nhận đăng; API add-on.

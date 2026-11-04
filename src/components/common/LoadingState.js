@@ -4,6 +4,7 @@ import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 
+/** @param {import('./types').LoadingStateProps} props */
 export const LoadingState = ({ message = 'Đang tải dữ liệu…', style }) => {
   return (
     <View style={[styles.container, style]}>

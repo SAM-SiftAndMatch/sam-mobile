@@ -1,7 +1,7 @@
 // Format numbers into currency strings
 export const formatCurrency = (amount, currency = 'VND') => {
   if (amount === undefined || amount === null) return '0 ₫';
-  
+
   if (typeof amount === 'string') {
     amount = parseFloat(amount);
   }
@@ -19,7 +19,7 @@ export const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return dateString;
-  
+
   const options = { year: 'numeric', month: 'short', day: 'numeric' };
   return date.toLocaleDateString('vi-VN', options);
 };

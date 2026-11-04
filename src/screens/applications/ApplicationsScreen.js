@@ -1,11 +1,14 @@
+import { useProposalDecision } from '../../features/marketplace/useProposalDecision';
+import { useChat } from '../../features/chat/useChat';
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
+import { selectUserProposals } from '../../features/marketplace/model/selectors';
 import React, { useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 import { Header } from '../../components/common/Header';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { ApplicantCard } from '../../components/job/ApplicantCard';
@@ -17,20 +20,15 @@ import { CustomButton } from '../../components/common/CustomButton';
 export const ApplicationsScreen = ({ route, navigation }) => {
   const { jobId } = route.params || {};
   const { user, role } = useAuth();
-  const { applications, changeAppStatus, loading, openMessages } = useApp();
+  const { applications, loading } = useMarketplace();
+  const { openMessages } = useChat();
+  const changeAppStatus = useProposalDecision();
 
   const [activeTab, setActiveTab] = useState('all'); // "all" | "pending" | "accepted" | "rejected"
 
   const isFreelancer = role === 'freelancer';
 
-  // Filter đề xuất list based on role & selected tab
-  const roleApplications = isFreelancer
-    ? applications.filter(
-        (app) => app.freelancerId === user?.id
-      )
-    : applications.filter((app) => {
-        return app.customerId === user?.id && (!jobId || app.jobId === jobId);
-      });
+  const roleApplications = selectUserProposals(applications, user, jobId);
 
   const filteredApps = roleApplications.filter((app) => {
     if (activeTab === 'all') return true;
@@ -41,10 +39,7 @@ export const ApplicationsScreen = ({ route, navigation }) => {
     try {
       await changeAppStatus(appId, status);
       if (status === 'accepted') return;
-      Alert.alert(
-        'Đã cập nhật',
-        `Trạng thái đề xuất đã được cập nhật.`
-      );
+      Alert.alert('Đã cập nhật', `Trạng thái đề xuất đã được cập nhật.`);
     } catch (err) {
       Alert.alert('Không thể cập nhật', err.message || 'Vui lòng thử lại.');
     }
@@ -69,7 +64,14 @@ export const ApplicationsScreen = ({ route, navigation }) => {
             style={[styles.tabBtn, activeTab === tab && styles.activeTabBtn]}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {{ all: 'Tất cả', pending: 'Đang chờ', accepted: 'Đã xác nhận', rejected: 'Từ chối' }[tab]}
+              {
+                {
+                  all: 'Tất cả',
+                  pending: 'Đang chờ',
+                  accepted: 'Đã xác nhận',
+                  rejected: 'Từ chối',
+                }[tab]
+              }
             </Text>
           </TouchableOpacity>
         ))}
@@ -89,9 +91,7 @@ export const ApplicationsScreen = ({ route, navigation }) => {
               return (
                 <TouchableOpacity
                   activeOpacity={0.9}
-                  onPress={() =>
-                    navigation.navigate('JobDetail', { jobId: item.jobId })
-                  }
+                  onPress={() => navigation.navigate('JobDetail', { jobId: item.jobId })}
                   style={styles.freelancerAppCard}
                 >
                   <View style={styles.cardHeader}>
@@ -108,14 +108,30 @@ export const ApplicationsScreen = ({ route, navigation }) => {
                   <View style={styles.priceRow}>
                     <View>
                       <Text style={styles.priceLabel}>Báo giá đề xuất</Text>
-                      <Text style={styles.priceValue}>{formatCurrency(item.proposedPrice, item.currency)}</Text>
+                      <Text style={styles.priceValue}>
+                        {formatCurrency(item.proposedPrice, item.currency)}
+                      </Text>
                     </View>
                     <View>
                       <Text style={styles.priceLabel}>Thời gian thực hiện</Text>
                       <Text style={styles.deliveryValue}>{item.deliveryTime}</Text>
                     </View>
                   </View>
-                  {item.status === 'accepted' ? <CustomButton title="Chat với khách hàng" icon="chatbubbles-outline" style={{ marginTop: 14 }} onPress={(event) => { event.stopPropagation(); openMessages(item.id); }} /> : item.status === 'pending' ? <Text style={{ color: COLORS.textMuted, marginTop: 12, fontSize: 12 }}>Bạn sẽ nhận thông báo khi khách hàng phản hồi.</Text> : null}
+                  {item.status === 'accepted' ? (
+                    <CustomButton
+                      title="Chat với khách hàng"
+                      icon="chatbubbles-outline"
+                      style={{ marginTop: 14 }}
+                      onPress={(event) => {
+                        event.stopPropagation();
+                        openMessages(item.id);
+                      }}
+                    />
+                  ) : item.status === 'pending' ? (
+                    <Text style={{ color: COLORS.textMuted, marginTop: 12, fontSize: 12 }}>
+                      Bạn sẽ nhận thông báo khi khách hàng phản hồi.
+                    </Text>
+                  ) : null}
                 </TouchableOpacity>
               );
             }
@@ -139,13 +155,11 @@ export const ApplicationsScreen = ({ route, navigation }) => {
               title="Chưa có đề xuất"
               message={
                 isFreelancer
-                  ? "Bạn chưa có đề xuất ở trạng thái này."
-                  : "Chưa có ứng viên cho dự án của bạn."
+                  ? 'Bạn chưa có đề xuất ở trạng thái này.'
+                  : 'Chưa có ứng viên cho dự án của bạn.'
               }
               actionTitle={isFreelancer ? 'Tìm việc' : 'Đăng dự án'}
-              onAction={() =>
-                navigation.navigate(isFreelancer ? 'Jobs' : 'CreatePost')
-              }
+              onAction={() => navigation.navigate(isFreelancer ? 'Jobs' : 'CreatePost')}
             />
           }
         />

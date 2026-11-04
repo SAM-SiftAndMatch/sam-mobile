@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
 import Text from '../../design/Text';
 import BrandLogo from '../../components/common/BrandLogo';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -8,7 +16,7 @@ import { SIZES } from '../../constants/sizes';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { CustomInput } from '../../components/common/CustomInput';
 import { CustomButton } from '../../components/common/CustomButton';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 
 export const LoginScreen = ({ navigation }) => {
   const { login, isLoading } = useAuth();
@@ -35,7 +43,10 @@ export const LoginScreen = ({ navigation }) => {
       await login(email, password);
       // Main navigator automatically handles navigation based on auth state
     } catch (err) {
-      Alert.alert('Đăng nhập chưa thành công', err.message || 'Vui lòng kiểm tra thông tin đăng nhập');
+      Alert.alert(
+        'Đăng nhập chưa thành công',
+        err.message || 'Vui lòng kiểm tra thông tin đăng nhập',
+      );
     }
   };
 
@@ -44,12 +55,14 @@ export const LoginScreen = ({ navigation }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quay lại" onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Quay lại"
+            onPress={() => navigation.goBack()}
+            style={styles.backBtn}
+          >
             <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
           </TouchableOpacity>
           <BrandLogo tagline />
@@ -101,7 +114,11 @@ export const LoginScreen = ({ navigation }) => {
 
         <View style={styles.footerRow}>
           <Text style={styles.footerText}>Bạn chưa có tài khoản? </Text>
-          <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            style={{ minHeight: 44, justifyContent: 'center' }}
+            onPress={() => navigation.navigate('Register')}
+          >
             <Text style={styles.registerLink}>Đăng ký</Text>
           </TouchableOpacity>
         </View>
@@ -127,15 +144,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 16,
   },
-  logoBadge: {
-    width: 50,
-    height: 50,
-    borderRadius: 14,
-    backgroundColor: COLORS.primaryBackground,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
   title: {
     marginTop: 24,
     fontSize: SIZES.h1,
@@ -146,41 +154,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.body2,
     color: COLORS.textSecondary,
     marginTop: 4,
-  },
-  demoBox: {
-    backgroundColor: COLORS.white,
-    padding: 12,
-    borderRadius: SIZES.radius,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  demoTitle: {
-    fontSize: SIZES.caption,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-    marginBottom: 8,
-  },
-  demoBtnRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  demoChip: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    borderRadius: SIZES.radiusSm,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.surface,
-    gap: 6,
-  },
-  demoChipText: {
-    fontSize: SIZES.caption,
-    fontWeight: '700',
-    color: COLORS.primary,
   },
   form: {
     marginBottom: 20,

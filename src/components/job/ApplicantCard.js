@@ -36,7 +36,9 @@ export const ApplicantCard = ({
         </View>
 
         <View style={styles.priceCol}>
-          <Text style={styles.price}>{formatCurrency(applicant.proposedPrice, applicant.currency)}</Text>
+          <Text style={styles.price}>
+            {formatCurrency(applicant.proposedPrice, applicant.currency)}
+          </Text>
           <StatusBadge status={applicant.status} style={styles.statusBadge} />
         </View>
       </View>
@@ -88,7 +90,14 @@ export const ApplicantCard = ({
           )}
         </View>
       )}
-      {applicant.status === 'accepted' && onChat && <CustomButton title="Chat với freelancer" icon="chatbubbles-outline" onPress={onChat} style={{ marginTop: 14 }} />}
+      {applicant.status === 'accepted' && onChat && (
+        <CustomButton
+          title="Chat với freelancer"
+          icon="chatbubbles-outline"
+          onPress={onChat}
+          style={{ marginTop: 14 }}
+        />
+      )}
     </View>
   );
 };

@@ -1,3 +1,4 @@
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import Text from '../../design/Text';
@@ -6,8 +7,7 @@ import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 import { validateRequired, validateNumber } from '../../utils/validation';
 import { formatCurrency } from '../../utils/formatCurrency';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 import { EmptyState } from '../../components/common/EmptyState';
 import { Header } from '../../components/common/Header';
 import { CustomInput } from '../../components/common/CustomInput';
@@ -16,18 +16,25 @@ import { CustomButton } from '../../components/common/CustomButton';
 export const ApplyJobScreen = ({ route, navigation }) => {
   const { job } = route.params || {};
   const { user } = useAuth();
-  const { submitApplication, loading } = useApp();
+  const { submitApplication, submitting: loading } = useMarketplace();
 
-  const [proposedPrice, setProposedPrice] = useState(
-    job ? job.budget.toString() : '500'
-  );
+  const [proposedPrice, setProposedPrice] = useState(job ? job.budget.toString() : '500');
   const [deliveryTime, setDeliveryTime] = useState('7 ngày');
   const [coverLetter, setCoverLetter] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState(user?.portfolio?.[0]?.link || '');
   const [errors, setErrors] = useState({});
   const [isSuccess, setIsSuccess] = useState(false);
 
-  if (!job) return <View style={styles.container}><Header title="Ứng tuyển dự án" showBack /><EmptyState title="Vui lòng chọn dự án" message="Mở một dự án trong mục Tìm việc để gửi đề xuất." /></View>;
+  if (!job)
+    return (
+      <View style={styles.container}>
+        <Header title="Ứng tuyển dự án" showBack />
+        <EmptyState
+          title="Vui lòng chọn dự án"
+          message="Mở một dự án trong mục Tìm việc để gửi đề xuất."
+        />
+      </View>
+    );
 
   const validateForm = () => {
     let errs = {};
@@ -73,12 +80,17 @@ export const ApplyJobScreen = ({ route, navigation }) => {
       <View style={styles.container}>
         <Header title="Ứng tuyển dự án" showBack />
 
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Target Job Info Card */}
           {job && (
             <View style={styles.jobBriefCard}>
               <Text style={styles.jobBriefTitle}>{job.title}</Text>
-              <Text style={styles.jobBriefBudget}>Ngân sách: {formatCurrency(job.budget, job.currency)}</Text>
+              <Text style={styles.jobBriefBudget}>
+                Ngân sách: {formatCurrency(job.budget, job.currency)}
+              </Text>
             </View>
           )}
 
@@ -87,7 +99,8 @@ export const ApplyJobScreen = ({ route, navigation }) => {
               <Ionicons name="checkmark-circle" size={64} color={COLORS.success} />
               <Text style={styles.successTitle}>Đã gửi đề xuất</Text>
               <Text style={styles.successMessage}>
-                Đã gửi đề xuất cho khách hàng. Khi đề xuất được duyệt và dự án bắt đầu, bạn có thể chat với khách hàng trong mục Tin nhắn.
+                Đã gửi đề xuất cho khách hàng. Khi đề xuất được duyệt và dự án bắt đầu, bạn có thể
+                chat với khách hàng trong mục Tin nhắn.
               </Text>
               <View style={styles.successBtnGroup}>
                 <CustomButton

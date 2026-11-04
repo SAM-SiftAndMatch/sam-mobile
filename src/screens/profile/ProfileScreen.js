@@ -4,7 +4,7 @@ import Text from '../../design/Text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../features/auth/AuthProvider';
 import { Header } from '../../components/common/Header';
 import { UserProfileHeader } from '../../components/user/UserProfileHeader';
 import { CustomButton } from '../../components/common/CustomButton';
@@ -43,9 +43,7 @@ export const ProfileScreen = ({ navigation }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* User Profile Header Component */}
-        <UserProfileHeader
-          user={user}
-        />
+        <UserProfileHeader user={user} />
 
         {/* Skills & Portfolio Section (For Freelancer) */}
         {isFreelancer && (
@@ -96,16 +94,15 @@ export const ProfileScreen = ({ navigation }) => {
                 <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={styles.menuTitle}>{item.title}</Text>
                   {item.subtitle ? <Text style={styles.menuSub}>{item.subtitle}</Text> : null}
-                {item.badge ? (
-                  <View style={[styles.badgePill, { backgroundColor: item.badgeColor }]}>
-                    <Text style={styles.badgeText}>{item.badge}</Text>
-                  </View>
-                ) : null}
+                  {item.badge ? (
+                    <View style={[styles.badgePill, { backgroundColor: item.badgeColor }]}>
+                      <Text style={styles.badgeText}>{item.badge}</Text>
+                    </View>
+                  ) : null}
                 </View>
               </View>
 
               <View style={styles.menuRight}>
-
                 <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
               </View>
             </TouchableOpacity>
