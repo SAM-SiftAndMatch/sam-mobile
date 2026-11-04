@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
@@ -24,18 +24,14 @@ export const JobsScreen = ({ navigation }) => {
     refreshJobs,
   } = useApp();
 
-  const [selectedStatus, setSelectedStatus] = useState('all'); // "all" | "open" | "completed"
 
   const isFreelancer = role === 'freelancer';
 
   // Apply filters
   const filteredJobs = jobs.filter((job) => {
-    if (job.status === 'draft') return false;
+    if (job.status !== 'open') return false;
     const matchesCategory =
       selectedCategory === 'All' || job.category === selectedCategory;
-
-    const matchesStatus =
-      selectedStatus === 'all' || job.status === selectedStatus;
 
     const matchesSearch =
       !searchQuery ||
@@ -43,7 +39,7 @@ export const JobsScreen = ({ navigation }) => {
       job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    return matchesCategory && matchesStatus && matchesSearch;
+    return matchesCategory && matchesSearch;
   });
 
   return (
@@ -106,29 +102,7 @@ export const JobsScreen = ({ navigation }) => {
           ))}
         </ScrollView>
 
-        {/* Status Pills */}
-        <View style={styles.statusFilterRow}>
-          <Text style={styles.statusFilterLabel}>Trạng thái:</Text>
-          {['all', 'open', 'draft'].map((status) => (
-            <TouchableOpacity
-              key={status}
-              onPress={() => setSelectedStatus(status)}
-              style={[
-                styles.statusPill,
-                selectedStatus === status && styles.selectedStatusPill,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.statusPillText,
-                  selectedStatus === status && styles.selectedStatusPillText,
-                ]}
-              >
-                {{ all: 'Tất cả', open: 'Đang tuyển', draft: 'Bản nháp' }[status]}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+
       </View>
 
       {/* Main Job FlatList */}
@@ -159,7 +133,6 @@ export const JobsScreen = ({ navigation }) => {
               onAction={() => {
                 setSearchQuery('');
                 setSelectedCategory('All');
-                setSelectedStatus('all');
               }}
             />
           }
@@ -210,6 +183,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   statusFilterRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,

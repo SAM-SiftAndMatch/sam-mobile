@@ -9,7 +9,7 @@ export const SectionHeader = ({ title, actionTitle, onAction, style }) => {
     <View style={[styles.container, style]}>
       <Text style={styles.title}>{title}</Text>
       {actionTitle && onAction && (
-        <TouchableOpacity onPress={onAction}>
+        <TouchableOpacity accessibilityRole="button" onPress={onAction} style={styles.action}>
           <Text style={styles.actionText}>{actionTitle}</Text>
         </TouchableOpacity>
       )}
@@ -24,9 +24,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
     marginTop: 16,
-    paddingHorizontal: SIZES.padding,
+    gap: 8,
   },
+  action: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
   title: {
+    flex: 1,
     fontSize: SIZES.h3,
     fontWeight: '700',
     color: COLORS.textPrimary,

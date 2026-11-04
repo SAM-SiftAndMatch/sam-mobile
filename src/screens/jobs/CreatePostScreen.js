@@ -26,7 +26,7 @@ function ReviewCard({ title, onEdit, children }) {
   return <View style={styles.card}><View style={styles.row}><Text style={styles.cardTitle}>{title}</Text><TouchableOpacity accessibilityRole="button" onPress={onEdit} style={styles.edit}><Text style={styles.blue}>Chỉnh sửa</Text></TouchableOpacity></View>{children}</View>;
 }
 
-export const CreatePostScreen = () => {
+export const CreatePostScreen = ({ navigation }) => {
   const { postJob, categories } = useApp();
   const [form, setForm] = useState(initialProjectForm);
   const [step, setStep] = useState(0);
@@ -66,8 +66,8 @@ export const CreatePostScreen = () => {
   const reset = () => { setForm(initialProjectForm()); setResult(null); setSubmitError(''); setAssisted(true); goTo(0); };
   const input = (key, label, props = {}) => <CustomInput label={label} value={form[key]} onChangeText={(value) => set(key, value)} error={errors[key]} {...props} />;
 
-  return <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <Header title="SAM • Đăng dự án" subtitle={result ? 'Dự án của bạn' : `Bước ${step + 1} / 4`} showBack={!result && step > 0 && !submitting} onBackPress={() => goTo(step - 1)} />
+  return <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <Header title="SAM • Đăng dự án" subtitle={result ? 'Dự án của bạn' : `Bước ${step + 1} / 4`} showBack={!submitting} onBackPress={() => step > 0 && !result ? goTo(step - 1) : navigation.goBack()} />
     <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
       {result ? <View style={[styles.card, styles.success]}>
         <Ionicons name="checkmark-circle" size={70} color={COLORS.success} />
@@ -164,13 +164,13 @@ const styles = StyleSheet.create({
   eyebrow: { color: COLORS.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.2, marginBottom: 10 },
   heading: { fontSize: 26, lineHeight: 34, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 10 },
   subtitle: { color: COLORS.textSecondary, fontSize: 14, lineHeight: 22, marginBottom: 24 },
-  card: { backgroundColor: COLORS.white, borderRadius: 22, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border, shadowColor: COLORS.primaryDark, shadowOpacity: 0.04, shadowOffset: { width: 0, height: 4 }, shadowRadius: 12, elevation: 1 },
+  card: { backgroundColor: COLORS.white, borderRadius: 12, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.border, shadowColor: COLORS.primaryDark, shadowOpacity: 0.04, shadowOffset: { width: 0, height: 4 }, shadowRadius: 12, elevation: 1 },
   cardTitle: { fontSize: 16, lineHeight: 23, color: COLORS.textPrimary, fontWeight: '700', marginBottom: 14, flexShrink: 1 },
   label: { fontSize: 14, fontWeight: '600', color: COLORS.textPrimary, marginBottom: 10 },
   body: { fontSize: 14, lineHeight: 23, color: COLORS.textSecondary, marginBottom: 8, flexShrink: 1 },
   hint: { fontSize: 12, lineHeight: 19, color: COLORS.textSecondary, marginVertical: 10 },
   choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  choice: { borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.white, paddingVertical: 12, paddingHorizontal: 12, borderRadius: 12 },
+  choice: { minHeight: 44, justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.white, paddingVertical: 12, paddingHorizontal: 12, borderRadius: 12 },
   choiceActive: { backgroundColor: COLORS.primaryBackground, borderColor: COLORS.primary }, choiceText: { fontSize: 12, color: COLORS.textSecondary, fontWeight: '600' },
   blue: { color: COLORS.primary, fontWeight: '700' }, white: { color: COLORS.white },
   assistant: { padding: 14, borderRadius: 16, backgroundColor: COLORS.primaryBackground, marginBottom: 20 },
@@ -180,10 +180,10 @@ const styles = StyleSheet.create({
   selectedCard: { borderColor: COLORS.primary, backgroundColor: COLORS.primaryBackground },
   iconBox: { padding: 10, backgroundColor: COLORS.primaryBackground, borderRadius: 12, marginBottom: 12 },
   price: { color: COLORS.primary, fontWeight: '700', fontSize: 15, marginVertical: 8 },
-  total: { padding: 20, borderRadius: 20, marginVertical: 8, borderWidth: 1, borderColor: COLORS.borderDark },
-  actions: { gap: 10, marginTop: 20 }, edit: { paddingVertical: 12 }, error: { color: COLORS.danger, lineHeight: 21, marginVertical: 12 },
+  total: { padding: 20, borderRadius: 12, marginVertical: 8, borderWidth: 1, borderColor: COLORS.borderDark },
+  actions: { gap: 10, marginTop: 20 }, edit: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }, error: { color: COLORS.danger, lineHeight: 21, marginVertical: 12 },
   success: { alignItems: 'center', gap: 10, marginTop: 24 }, fullWidth: { alignSelf: 'stretch' },
   overlay: { flex: 1, backgroundColor: COLORS.overlay }, modalScroll: { flexGrow: 1, justifyContent: 'center', padding: 24 },
-  modalCard: { backgroundColor: COLORS.white, borderRadius: 26, padding: 24, gap: 10, maxWidth: 480, width: '100%', alignSelf: 'center' },
+  modalCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 24, gap: 10, maxWidth: 480, width: '100%', alignSelf: 'center' },
 });
 export default CreatePostScreen;

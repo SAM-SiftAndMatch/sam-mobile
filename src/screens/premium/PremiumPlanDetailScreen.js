@@ -1,4 +1,5 @@
 import { formatCurrency } from '../../utils/formatCurrency';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Modal } from 'react-native';
 import Text from '../../design/Text';
@@ -11,6 +12,7 @@ import { Header } from '../../components/common/Header';
 import { CustomButton } from '../../components/common/CustomButton';
 
 export const PremiumPlanDetailScreen = ({ route, navigation }) => {
+  const insets = useSafeAreaInsets();
   const { plan } = route.params || {};
   const { updateProfile } = useAuth();
   const { subscribeToPlan, loading } = useApp();
@@ -33,7 +35,7 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <Header title={`Gói ${plan.name}`} showBack />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent}>
         <View style={styles.planHeaderCard}>
           <View style={[styles.badge, { backgroundColor: plan.badgeColor || COLORS.primary }]}>
             <Text style={styles.badgeText}>{plan.name}</Text>
@@ -62,7 +64,7 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
         </View>
       </ScrollView>
 
-      <View style={styles.footerBar}>
+      <View style={[styles.footerBar, { paddingBottom: Math.max(16, insets.bottom) }]}>
         <CustomButton
           title={`Chọn gói (${formatCurrency(plan.price, plan.currency)})`}
           onPress={handleConfirmSubscribe}
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: SIZES.padding,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
   planHeaderCard: {
     backgroundColor: COLORS.white,
@@ -187,10 +189,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   footerBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: COLORS.white,
     padding: SIZES.padding,
     borderTopWidth: 1,

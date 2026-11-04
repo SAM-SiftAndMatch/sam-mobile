@@ -58,13 +58,11 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
           <Text style={styles.statNumber}>{user.rating || '5.0'}</Text>
           <Text style={styles.statLabel}>Đánh giá ★</Text>
         </View>
-        <View style={styles.statDivider} />
         <View style={styles.statBox}>
           <Text style={styles.statNumber}>{user.completedJobs || 0}</Text>
           <Text style={styles.statLabel}>Hoàn thành</Text>
         </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statBox}>
+        <View style={[styles.statBox, styles.moneyStat]}>
           <Text style={styles.statNumber}>
             {formatCurrency(isFreelancer ? user.hourlyRate : user.totalSpent, user.currency || 'VND')}
           </Text>
@@ -96,6 +94,7 @@ const styles = StyleSheet.create({
     marginLeft: 14,
   },
   titleRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -172,16 +171,22 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    flexWrap: 'wrap',
+    gap: 12,
     marginTop: 16,
     paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
   statBox: {
+    flexGrow: 1,
+    flexBasis: '40%',
+    minWidth: 0,
     alignItems: 'center',
   },
+  moneyStat: { flexBasis: '100%', paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.border },
   statNumber: {
+    textAlign: 'center',
     fontSize: SIZES.h4,
     fontWeight: '800',
     color: COLORS.textPrimary,

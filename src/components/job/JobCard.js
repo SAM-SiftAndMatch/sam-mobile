@@ -105,15 +105,15 @@ const styles = StyleSheet.create({
     ...SHADOWS.light,
   },
   topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 10,
     marginBottom: 10,
   },
   customerInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    alignSelf: 'stretch',
   },
   customerTextCol: {
     marginLeft: 10,
@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   ratingRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 2,
@@ -185,6 +186,8 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   footerRow: {
+    flexWrap: 'wrap',
+    gap: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

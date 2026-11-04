@@ -42,14 +42,14 @@ export const LoginScreen = ({ navigation }) => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quay lại" onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
           </TouchableOpacity>
           <BrandLogo tagline />
@@ -65,6 +65,7 @@ export const LoginScreen = ({ navigation }) => {
             placeholder="Nhập email của bạn"
             icon="mail-outline"
             keyboardType="email-address"
+            autoComplete="email"
             error={errors.email}
             required
           />
@@ -76,6 +77,7 @@ export const LoginScreen = ({ navigation }) => {
             placeholder="Nhập mật khẩu"
             icon="lock-closed-outline"
             isPassword
+            autoComplete="current-password"
             error={errors.password}
             required
           />
@@ -99,7 +101,7 @@ export const LoginScreen = ({ navigation }) => {
 
         <View style={styles.footerRow}>
           <Text style={styles.footerText}>Bạn chưa có tài khoản? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => navigation.navigate('Register')}>
             <Text style={styles.registerLink}>Đăng ký</Text>
           </TouchableOpacity>
         </View>
@@ -119,6 +121,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backBtn: {
+    alignSelf: 'flex-start',
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
     marginBottom: 16,
   },
   logoBadge: {
@@ -180,6 +186,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   forgotBtn: {
+    minHeight: 44,
+    justifyContent: 'center',
     alignSelf: 'flex-end',
     marginBottom: 20,
   },
@@ -192,6 +200,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   footerRow: {
+    alignItems: 'center',
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 10,

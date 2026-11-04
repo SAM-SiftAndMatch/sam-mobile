@@ -19,7 +19,7 @@ function IconButton({ name, label, onPress }) {
   return <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={styles.iconButton}><Ionicons name={name} size={23} color={COLORS.primary} /></TouchableOpacity>;
 }
 
-export function ConversationThread({ room, userId, onBack, onClose, embedded = false }) {
+export function ConversationThread({ room, userId, onBack, onClose, embedded = false, keyboardVerticalOffset = 0 }) {
   const { sendMessage, readConversation } = useApp();
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -46,7 +46,7 @@ export function ConversationThread({ room, userId, onBack, onClose, embedded = f
     finally { lock.current = false; setSending(false); }
   };
 
-  return <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+  return <KeyboardAvoidingView style={styles.fill} keyboardVerticalOffset={keyboardVerticalOffset} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
     <View style={styles.header}>
       {!embedded && <IconButton name="chevron-back" label="Danh sách hội thoại" onPress={onBack} />}
       <UserAvatar uri={peer.avatar} name={peer.name} size={42} />
@@ -141,12 +141,12 @@ const styles = StyleSheet.create({
   inbox: { padding: 16, paddingTop: 0, flexGrow: 1 }, conversation: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, backgroundColor: COLORS.white, borderRadius: 12, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
   conversationProject: { color: COLORS.primary, fontSize: 12, fontWeight: '600', marginVertical: 5 }, badge: { backgroundColor: COLORS.primary, borderRadius: 14, minWidth: 24, padding: 5, alignItems: 'center' }, badgeText: { color: COLORS.white, fontSize: 11, fontWeight: '700' },
   project: { flexDirection: 'row', alignItems: 'center', gap: 12, margin: 14, padding: 14, borderRadius: 18, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border }, projectIcon: { backgroundColor: COLORS.primaryBackground, padding: 10, borderRadius: 12 },
-  eyebrow: { color: COLORS.primary, fontSize: 9, fontWeight: '800', letterSpacing: 0.6, marginBottom: 5 }, projectTitle: { color: COLORS.textPrimary, fontWeight: '700', fontSize: 13, lineHeight: 19 },
+  eyebrow: { color: COLORS.primary, fontSize: 11, fontWeight: '800', letterSpacing: 0.6, marginBottom: 5 }, projectTitle: { color: COLORS.textPrimary, fontWeight: '700', fontSize: 13, lineHeight: 19 },
   details: { paddingHorizontal: 22, paddingBottom: 12, gap: 5 }, bold: { fontWeight: '700', color: COLORS.primary },
   messages: { padding: 16, flexGrow: 1 }, messageRow: { alignItems: 'flex-start', marginVertical: 8 }, myRow: { alignItems: 'flex-end' },
   bubble: { backgroundColor: COLORS.white, padding: 14, borderRadius: 12, borderBottomLeftRadius: 5, maxWidth: '86%' }, myBubble: { backgroundColor: COLORS.primary, borderBottomLeftRadius: 20, borderBottomRightRadius: 5 }, messageText: { color: COLORS.textPrimary, fontSize: 15, lineHeight: 23 }, white: { color: COLORS.white },
-  timestamp: { color: COLORS.textMuted, fontSize: 10, marginTop: 5, maxWidth: '90%' }, systemNote: { color: COLORS.textMuted, textAlign: 'center', fontSize: 11, padding: 14 },
+  timestamp: { color: COLORS.textMuted, fontSize: 12, marginTop: 5, maxWidth: '90%' }, systemNote: { color: COLORS.textMuted, textAlign: 'center', fontSize: 11, padding: 14 },
   composer: { flexDirection: 'row', gap: 12, alignItems: 'flex-end', marginHorizontal: 12, marginVertical: 8, padding: 10, backgroundColor: COLORS.white, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border },
-  input: { flex: 1, minHeight: 44, maxHeight: 130, paddingHorizontal: 10, paddingVertical: 12, color: COLORS.textPrimary, fontSize: 15 }, send: { width: 44, height: 44, borderRadius: 17, justifyContent: 'center', alignItems: 'center' }, disabled: { opacity: 0.4 },
+  input: { flex: 1, minWidth: 0, fontFamily: 'BeVietnamPro_400Regular', minHeight: 44, maxHeight: 130, paddingHorizontal: 10, paddingVertical: 12, color: COLORS.textPrimary, fontSize: 16 }, send: { width: 44, height: 44, borderRadius: 17, justifyContent: 'center', alignItems: 'center' }, disabled: { opacity: 0.4 },
   emptyMessages: { alignItems: 'center', padding: 30, gap: 14 }, emptyTitle: { color: COLORS.textPrimary, fontSize: 20, fontWeight: '700' }, emptyBody: { color: COLORS.textSecondary, textAlign: 'center', fontSize: 14, lineHeight: 23 }, error: { color: COLORS.danger, paddingHorizontal: 20, paddingVertical: 8, fontSize: 12 },
 });

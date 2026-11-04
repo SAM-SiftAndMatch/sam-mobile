@@ -71,7 +71,7 @@ export const CustomButton = ({
       style={[getContainerStyle(), style]}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? COLORS.primary : COLORS.white} size="small" />
+        <ActivityIndicator color={['outline', 'ghost'].includes(variant) ? COLORS.primary : COLORS.white} size="small" />
       ) : (
         <View style={styles.contentRow}>
           {icon && iconPosition === 'left' && (
@@ -98,6 +98,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   contentRow: {
+    flexShrink: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { COLORS } from '../constants/colors';
 import { screenNavigation } from './navigation';
 import { useLocalSearchParams } from 'expo-router';
 import { useApp } from '../context/AppContext';
@@ -15,5 +16,5 @@ export default function ScreenRoute({ screen: Screen }) {
   const plan = mockPremiumPlans.find(p => p.id === params.planId);
   if (params.jobId && !jobs.length && loading) return <LoadingState message="Đang tải dự án…" />;
   if ((params.jobId && !loading && !job) || (params.planId && !plan)) return <View style={{ flex: 1 }}><Header title="Không tìm thấy nội dung" showBack /><EmptyState title="Nội dung không còn khả dụng" message="Quay lại danh sách để tải dữ liệu mới nhất." /></View>;
-  return <Screen navigation={screenNavigation} route={{ params: { ...params, job, plan } }} />;
+  return <View style={{ flex: 1, backgroundColor: COLORS.background, alignItems: 'center' }}><View style={{ flex: 1, width: '100%', maxWidth: 760 }}><Screen navigation={screenNavigation} route={{ params: { ...params, job, plan } }} /></View></View>;
 }

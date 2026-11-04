@@ -55,13 +55,13 @@ export const RegisterScreen = ({ navigation }) => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quay lại" onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
 
@@ -167,6 +167,7 @@ export const RegisterScreen = ({ navigation }) => {
             placeholder="john@example.com"
             icon="mail-outline"
             keyboardType="email-address"
+            autoComplete="email"
             error={errors.email}
             required
           />
@@ -178,6 +179,7 @@ export const RegisterScreen = ({ navigation }) => {
             placeholder="Ít nhất 6 ký tự"
             icon="lock-closed-outline"
             isPassword
+            autoComplete="new-password"
             error={errors.password}
             required
           />
@@ -189,6 +191,7 @@ export const RegisterScreen = ({ navigation }) => {
             placeholder="Nhập lại mật khẩu"
             icon="shield-checkmark-outline"
             isPassword
+            autoComplete="new-password"
             error={errors.confirmPassword}
             required
           />
@@ -205,7 +208,7 @@ export const RegisterScreen = ({ navigation }) => {
 
         <View style={styles.footerRow}>
           <Text style={styles.footerText}>Bạn đã có tài khoản? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity accessibilityRole="button" style={{ minHeight: 44, justifyContent: 'center' }} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.loginLink}>Đăng nhập</Text>
           </TouchableOpacity>
         </View>
@@ -221,6 +224,10 @@ const styles = StyleSheet.create({
     padding: SIZES.paddingLg,
   },
   backBtn: {
+    alignSelf: 'flex-start',
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
     marginTop: 10,
     marginBottom: 16,
   },
@@ -303,6 +310,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   footerRow: {
+    alignItems: 'center',
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'center',
     marginVertical: 14,

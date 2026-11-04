@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, useWindowDimensions } from 'react-native';
 import Text from '../../design/Text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
@@ -15,6 +15,8 @@ import { CustomButton } from '../../components/common/CustomButton';
 import { LoadingState } from '../../components/common/LoadingState';
 
 export const JobDetailScreen = ({ route, navigation }) => {
+  const { width, fontScale } = useWindowDimensions();
+  const compact = width < 380 || fontScale > 1.15;
   const insets = useSafeAreaInsets();
   const { jobId } = route.params || {};
   const { user, role } = useAuth();
@@ -43,7 +45,7 @@ export const JobDetailScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <Header title="Chi tiết dự án" showBack />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView style={compact ? { width: '100%' } : { flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Main Job Overview Card */}
         <View style={styles.card}>
           <View style={styles.categoryRow}>
@@ -51,7 +53,7 @@ export const JobDetailScreen = ({ route, navigation }) => {
               <Ionicons name="pricetag-outline" size={12} color={COLORS.primary} />
               <Text style={styles.categoryText}>{job.category}</Text>
             </View>
-            <StatusBadge status={job.status} />
+            <StatusBadge status={job.status} style={{ flexShrink: 0, maxWidth: '100%' }} />
           </View>
 
           <Text style={styles.title}>{job.title}</Text>
@@ -150,18 +152,19 @@ export const JobDetailScreen = ({ route, navigation }) => {
             />
           )
         ) : (
-          <View style={styles.customerActionRow}>
+          <View style={[styles.customerActionRow, compact && { flexDirection: 'column', alignItems: 'stretch' }]}>
             <CustomButton
               title="Xem ứng viên"
               onPress={() => navigation.navigate('Applications', { jobId: job.id })}
               variant="primary"
               size="large"
               icon="people-outline"
-              style={{ flex: 1 }}
+              style={compact ? { width: '100%' } : { flex: 1 }}
             />
             {isOwner && (
               <CustomButton
                 title="Chỉnh sửa"
+                style={compact ? { width: '100%' } : undefined}
                 onPress={() => Alert.alert('Chỉnh sửa dự án', 'Chức năng chỉnh sửa đang được phát triển.')}
                 variant="outline"
                 size="large"
@@ -182,7 +185,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: SIZES.padding,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
   card: {
     backgroundColor: COLORS.white,
@@ -194,6 +197,8 @@ const styles = StyleSheet.create({
     ...SHADOWS.light,
   },
   categoryRow: {
+    flexWrap: 'wrap',
+    gap: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -270,6 +275,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   customerCol: {
+    flex: 1,
+    minWidth: 0,
     marginLeft: 12,
   },
   customerName: {
@@ -278,6 +285,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   ratingRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 3,
@@ -330,10 +338,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footerBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: COLORS.white,
     paddingHorizontal: SIZES.padding,
     paddingVertical: 14,
@@ -359,6 +363,7 @@ const styles = StyleSheet.create({
     color: COLORS.success,
   },
   customerActionRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     gap: 10,
   },

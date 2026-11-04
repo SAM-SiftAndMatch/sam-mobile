@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 
-export const Header = ({ title, showBack = false, onBackPress, rightIcon, onRightPress, subtitle }) => {
+export const Header = ({ title, showBack = false, onBackPress, rightIcon, onRightPress, subtitle, rightAccessibilityLabel }) => {
   const navigation = screenNavigation;
 
   return (
@@ -18,14 +18,14 @@ export const Header = ({ title, showBack = false, onBackPress, rightIcon, onRigh
             <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
           </TouchableOpacity>
         )}
-        <View>
+        <View style={styles.heading}>
           <Text style={styles.title}>{title}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
       </View>
 
       {rightIcon && onRightPress && (
-        <TouchableOpacity onPress={onRightPress} style={styles.rightBtn}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={rightAccessibilityLabel || ({ 'add-circle-outline': 'Tạo dự án', 'chatbubbles-outline': 'Mở tin nhắn', 'log-out-outline': 'Đăng xuất' }[rightIcon] || 'Tùy chọn')} onPress={onRightPress} style={styles.rightBtn}>
           <Ionicons name={rightIcon} size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
       )}
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingRight: 12,
   },
+  heading: { flex: 1, minWidth: 0 },
   title: {
     fontSize: SIZES.h3,
     fontWeight: '700',

@@ -93,18 +93,19 @@ export const ProfileScreen = ({ navigation }) => {
                 <View style={styles.menuIconBg}>
                   <Ionicons name={item.icon} size={20} color={COLORS.primary} />
                 </View>
-                <View>
+                <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={styles.menuTitle}>{item.title}</Text>
                   {item.subtitle ? <Text style={styles.menuSub}>{item.subtitle}</Text> : null}
-                </View>
-              </View>
-
-              <View style={styles.menuRight}>
                 {item.badge ? (
                   <View style={[styles.badgePill, { backgroundColor: item.badgeColor }]}>
                     <Text style={styles.badgeText}>{item.badge}</Text>
                   </View>
                 ) : null}
+                </View>
+              </View>
+
+              <View style={styles.menuRight}>
+
                 <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
               </View>
             </TouchableOpacity>
@@ -189,6 +190,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   menuRow: {
+    gap: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -197,6 +199,8 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   menuLeft: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -224,6 +228,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   badgePill: {
+    alignSelf: 'flex-start',
+    marginTop: 6,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: SIZES.radiusFull,
