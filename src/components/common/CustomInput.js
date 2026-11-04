@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 
@@ -18,6 +19,9 @@ export const CustomInput = ({
   required = false,
   style,
   inputStyle,
+  onFocus,
+  onBlur,
+  ...inputProps
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -48,6 +52,10 @@ export const CustomInput = ({
         )}
 
         <TextInput
+          accessibilityLabel={label || placeholder}
+          autoCapitalize={isPassword || keyboardType === 'email-address' ? 'none' : 'sentences'}
+          autoCorrect={!(isPassword || keyboardType === 'email-address')}
+          {...inputProps}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
@@ -56,8 +64,14 @@ export const CustomInput = ({
           keyboardType={keyboardType}
           multiline={multiline}
           numberOfLines={multiline ? numberOfLines : 1}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={(event) => {
+            setIsFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            onBlur?.(event);
+          }}
           style={[
             styles.textInput,
             multiline && { textAlignVertical: 'top', minHeight: 80 },
@@ -67,6 +81,8 @@ export const CustomInput = ({
 
         {isPassword && (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
             onPress={() => setShowPassword(!showPassword)}
             style={styles.eyeIcon}
           >
@@ -79,7 +95,11 @@ export const CustomInput = ({
         )}
       </View>
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error ? (
+        <Text accessibilityLiveRegion="polite" style={styles.errorText}>
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 };
@@ -103,7 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderWidth: 1.5,
     borderColor: COLORS.border,
-    borderRadius: SIZES.radius,
+    borderRadius: SIZES.radiusSm,
     paddingHorizontal: 12,
     minHeight: 48,
   },
@@ -122,12 +142,18 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    fontSize: SIZES.body2,
+    minWidth: 0,
+    fontSize: SIZES.body1,
+    fontFamily: 'BeVietnamPro_400Regular',
     color: COLORS.textPrimary,
     paddingVertical: 8,
   },
   eyeIcon: {
-    padding: 4,
+    width: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: -10,
     marginLeft: 6,
   },
   errorText: {

@@ -1,82 +1,54 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
-import Header from '../../components/common/Header';
-import UserProfileHeader from '../../components/user/UserProfileHeader';
-import CustomButton from '../../components/common/CustomButton';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { Header } from '../../components/common/Header';
+import { UserProfileHeader } from '../../components/user/UserProfileHeader';
+import { CustomButton } from '../../components/common/CustomButton';
 
 export const ProfileScreen = ({ navigation }) => {
-  const { user, role, logout, switchRole } = useAuth();
+  const { user, role, logout } = useAuth();
 
   const isFreelancer = role === 'freelancer';
-
-  const handleRoleToggle = () => {
-    const targetRole = isFreelancer ? 'customer' : 'freelancer';
-    switchRole(targetRole);
-    Alert.alert('Role Switched', `Switched role to ${targetRole.toUpperCase()} mode.`);
-  };
 
   const menuItems = [
     {
       id: 'm1',
-      title: isFreelancer ? 'My Applications' : 'My Posted Jobs',
+      title: isFreelancer ? 'Đề xuất của tôi' : 'Dự án của tôi',
       icon: isFreelancer ? 'paper-plane-outline' : 'briefcase-outline',
       onPress: () => navigation.navigate(isFreelancer ? 'Applications' : 'MyPosts'),
     },
     {
       id: 'm2',
-      title: 'WorkMarket Premium',
+      title: 'SAM Premium',
       icon: 'sparkles-outline',
-      badge: user?.isPremium ? 'ACTIVE' : 'UPGRADE',
+      badge: user?.isPremium ? 'ĐANG DÙNG' : 'NÂNG CẤP',
       badgeColor: user?.isPremium ? COLORS.success : COLORS.accent,
       onPress: () => navigation.navigate('Premium'),
     },
     {
       id: 'm3',
-      title: 'Notifications',
+      title: 'Thông báo',
       icon: 'notifications-outline',
       onPress: () => navigation.navigate('Notifications'),
-    },
-    {
-      id: 'm4',
-      title: 'Switch Account Role',
-      subtitle: `Current: ${isFreelancer ? 'Freelancer' : 'Customer'}`,
-      icon: 'swap-horizontal-outline',
-      onPress: handleRoleToggle,
-    },
-    {
-      id: 'm5',
-      title: 'Settings & Security',
-      icon: 'settings-outline',
-      onPress: () => Alert.alert('Settings', 'Account settings & notifications preferences'),
     },
   ];
 
   return (
     <View style={styles.container}>
-      <Header title="My Profile" rightIcon="log-out-outline" onRightPress={logout} />
+      <Header title="Hồ sơ của tôi" rightIcon="log-out-outline" onRightPress={logout} />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* User Profile Header Component */}
-        <UserProfileHeader
-          user={user}
-          onSwitchRolePress={handleRoleToggle}
-        />
+        <UserProfileHeader user={user} />
 
         {/* Skills & Portfolio Section (For Freelancer) */}
         {isFreelancer && (
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Skills & Expertise</Text>
+            <Text style={styles.sectionTitle}>Kỹ năng và kinh nghiệm</Text>
             <View style={styles.skillsRow}>
               {user?.skills?.map((skill, index) => (
                 <View key={index} style={styles.skillChip}>
@@ -88,11 +60,11 @@ export const ProfileScreen = ({ navigation }) => {
 
             {user?.portfolio && user.portfolio.length > 0 && (
               <View style={{ marginTop: 14 }}>
-                <Text style={styles.subTitle}>Featured Portfolio</Text>
+                <Text style={styles.subTitle}>Dự án nổi bật</Text>
                 {user.portfolio.map((item) => (
                   <TouchableOpacity
                     key={item.id}
-                    onPress={() => Alert.alert('Portfolio Link', item.link)}
+                    onPress={() => Alert.alert('Liên kết dự án', item.link)}
                     style={styles.portfolioItem}
                   >
                     <Ionicons name="folder-open-outline" size={18} color={COLORS.primary} />
@@ -107,7 +79,7 @@ export const ProfileScreen = ({ navigation }) => {
 
         {/* Action Menu List */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Account Options</Text>
+          <Text style={styles.sectionTitle}>Tài khoản</Text>
           {menuItems.map((item) => (
             <TouchableOpacity
               key={item.id}
@@ -119,18 +91,18 @@ export const ProfileScreen = ({ navigation }) => {
                 <View style={styles.menuIconBg}>
                   <Ionicons name={item.icon} size={20} color={COLORS.primary} />
                 </View>
-                <View>
+                <View style={{ flex: 1, minWidth: 0 }}>
                   <Text style={styles.menuTitle}>{item.title}</Text>
                   {item.subtitle ? <Text style={styles.menuSub}>{item.subtitle}</Text> : null}
+                  {item.badge ? (
+                    <View style={[styles.badgePill, { backgroundColor: item.badgeColor }]}>
+                      <Text style={styles.badgeText}>{item.badge}</Text>
+                    </View>
+                  ) : null}
                 </View>
               </View>
 
               <View style={styles.menuRight}>
-                {item.badge ? (
-                  <View style={[styles.badgePill, { backgroundColor: item.badgeColor }]}>
-                    <Text style={styles.badgeText}>{item.badge}</Text>
-                  </View>
-                ) : null}
                 <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
               </View>
             </TouchableOpacity>
@@ -138,7 +110,7 @@ export const ProfileScreen = ({ navigation }) => {
         </View>
 
         <CustomButton
-          title="Sign Out"
+          title="Đăng xuất"
           onPress={logout}
           variant="danger"
           size="medium"
@@ -215,6 +187,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   menuRow: {
+    gap: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -223,6 +196,8 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   menuLeft: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -250,6 +225,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   badgePill: {
+    alignSelf: 'flex-start',
+    marginTop: 6,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: SIZES.radiusFull,

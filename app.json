@@ -4,21 +4,25 @@
     "slug": "SAM",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/brand/app-icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/brand/monochrome.png",
+        "backgroundColor": "#FFFFFF",
+        "monochromeImage": "./assets/brand/monochrome.png"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/brand/app-icon.png"
+    },
+    "scheme": "sam",
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ]
   }
 }

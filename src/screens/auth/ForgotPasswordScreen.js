@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 import { validateEmail } from '../../utils/validation';
-import CustomInput from '../../components/common/CustomInput';
-import CustomButton from '../../components/common/CustomButton';
+import { CustomInput } from '../../components/common/CustomInput';
+import { CustomButton } from '../../components/common/CustomButton';
 
 export const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ export const ForgotPasswordScreen = ({ navigation }) => {
 
   const handleReset = () => {
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
+      setError('Vui lòng nhập email hợp lệ');
       return;
     }
     setError('');
@@ -27,20 +28,18 @@ export const ForgotPasswordScreen = ({ navigation }) => {
         <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Reset Password 🔑</Text>
+      <Text style={styles.title}>Khôi phục mật khẩu</Text>
       <Text style={styles.subtitle}>
-        Enter your registered email address and we will send instructions to reset your password.
+        Tính năng khôi phục mật khẩu chưa khả dụng. Vui lòng liên hệ người quản lý tài khoản.
       </Text>
 
       {submitted ? (
         <View style={styles.successBox}>
           <Ionicons name="checkmark-circle" size={54} color={COLORS.success} />
-          <Text style={styles.successTitle}>Reset Email Sent!</Text>
-          <Text style={styles.successText}>
-            We've sent password reset instructions to {email}.
-          </Text>
+          <Text style={styles.successTitle}>Yêu cầu đã được ghi nhận</Text>
+          <Text style={styles.successText}>Yêu cầu khôi phục cho {email}.</Text>
           <CustomButton
-            title="Back to Login"
+            title="Quay lại đăng nhập"
             onPress={() => navigation.navigate('Login')}
             variant="primary"
             size="medium"
@@ -50,10 +49,10 @@ export const ForgotPasswordScreen = ({ navigation }) => {
       ) : (
         <View style={styles.form}>
           <CustomInput
-            label="Registered Email"
+            label="Email đã đăng ký"
             value={email}
             onChangeText={setEmail}
-            placeholder="enter your email address"
+            placeholder="Nhập email của bạn"
             icon="mail-outline"
             keyboardType="email-address"
             error={error}
@@ -61,8 +60,9 @@ export const ForgotPasswordScreen = ({ navigation }) => {
           />
 
           <CustomButton
-            title="Send Reset Link"
+            title="Gửi liên kết khôi phục"
             onPress={handleReset}
+            disabled
             variant="primary"
             size="large"
             style={{ marginTop: 10 }}

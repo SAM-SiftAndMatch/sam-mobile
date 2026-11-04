@@ -1,0 +1,50 @@
+{
+  "results": [
+    {
+      "width": 320,
+      "passed": true
+    },
+    {
+      "width": 360,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "passed": true
+    },
+    {
+      "width": 768,
+      "passed": true
+    }
+  ],
+  "runtimeErrors": [],
+  "checks": [
+    "login and role tab",
+    "password toggle",
+    "44px input buttons",
+    "chat draft across tabs",
+    "no document overflow",
+    "short viewport form",
+    "130% CSS text stress (not native Dynamic Type)"
+  ],
+  "targetedRegression": {
+    "widths": [
+      320,
+      390
+    ],
+    "screens": [
+      "profile",
+      "job-detail"
+    ],
+    "textStress": "130% CSS",
+    "passed": true
+  },
+  "validation": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "existingTests": "2 passed",
+    "webExport": "passed",
+    "androidExport": "passed",
+    "nativeDeviceTested": false
+  }
+}

@@ -1,9 +1,11 @@
+import { formatCurrency } from '../../utils/formatCurrency';
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
-import CustomButton from '../common/CustomButton';
+import { CustomButton } from '../common/CustomButton';
 
 export const PremiumCard = ({ plan, isCurrentPlan = false, onSelect }) => {
   return (
@@ -11,7 +13,7 @@ export const PremiumCard = ({ plan, isCurrentPlan = false, onSelect }) => {
       {plan.popular && (
         <View style={styles.popularTag}>
           <Ionicons name="sparkles" size={12} color={COLORS.white} />
-          <Text style={styles.popularTagText}>MOST POPULAR</Text>
+          <Text style={styles.popularTagText}>ĐƯỢC QUAN TÂM</Text>
         </View>
       )}
 
@@ -23,7 +25,7 @@ export const PremiumCard = ({ plan, isCurrentPlan = false, onSelect }) => {
 
         <View style={styles.priceRow}>
           <Text style={styles.priceText}>
-            {plan.price === 0 ? 'Free' : `$${plan.price}`}
+            {plan.price === 0 ? 'Miễn phí' : formatCurrency(plan.price, plan.currency)}
           </Text>
           {plan.price > 0 && <Text style={styles.periodText}>/{plan.period}</Text>}
         </View>
@@ -40,7 +42,7 @@ export const PremiumCard = ({ plan, isCurrentPlan = false, onSelect }) => {
       </View>
 
       <CustomButton
-        title={isCurrentPlan ? 'Current Active Plan' : `Subscribe to ${plan.name}`}
+        title={isCurrentPlan ? 'Gói đang sử dụng' : `Chọn gói ${plan.name}`}
         onPress={onSelect}
         variant={isCurrentPlan ? 'outline' : plan.popular ? 'secondary' : 'primary'}
         disabled={isCurrentPlan}

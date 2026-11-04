@@ -1,38 +1,40 @@
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 import { validateRequired, validateNumber } from '../../utils/validation';
 import { formatCurrency } from '../../utils/formatCurrency';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import CustomInput from '../../components/common/CustomInput';
-import CustomButton from '../../components/common/CustomButton';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { EmptyState } from '../../components/common/EmptyState';
+import { Header } from '../../components/common/Header';
+import { CustomInput } from '../../components/common/CustomInput';
+import { CustomButton } from '../../components/common/CustomButton';
 
 export const ApplyJobScreen = ({ route, navigation }) => {
   const { job } = route.params || {};
   const { user } = useAuth();
-  const { submitApplication, loading } = useApp();
+  const { submitApplication, submitting: loading } = useMarketplace();
 
-  const [proposedPrice, setProposedPrice] = useState(
-    job ? job.budget.toString() : '500'
-  );
-  const [deliveryTime, setDeliveryTime] = useState('7 days');
+  const [proposedPrice, setProposedPrice] = useState(job ? job.budget.toString() : '500');
+  const [deliveryTime, setDeliveryTime] = useState('7 ngày');
   const [coverLetter, setCoverLetter] = useState('');
-  const [portfolioUrl, setPortfolioUrl] = useState(
-    user?.portfolio?.[0]?.link || 'https://github.com/alexjohnson'
-  );
+  const [portfolioUrl, setPortfolioUrl] = useState(user?.portfolio?.[0]?.link || '');
   const [errors, setErrors] = useState({});
   const [isSuccess, setIsSuccess] = useState(false);
+
+  if (!job)
+    return (
+      <View style={styles.container}>
+        <Header title="Ứng tuyển dự án" showBack />
+        <EmptyState
+          title="Vui lòng chọn dự án"
+          message="Mở một dự án trong mục Tìm việc để gửi đề xuất."
+        />
+      </View>
+    );
 
   const validateForm = () => {
     let errs = {};
@@ -40,10 +42,10 @@ export const ApplyJobScreen = ({ route, navigation }) => {
       errs.proposedPrice = 'Vui lòng nhập báo giá hợp lệ';
     }
     if (!validateRequired(deliveryTime)) {
-      errs.deliveryTime = 'Delivery time is required (e.g. 5 days)';
+      errs.deliveryTime = 'Vui lòng nhập thời gian thực hiện';
     }
     if (!validateRequired(coverLetter) || coverLetter.length < 20) {
-      errs.coverLetter = 'Cover letter must be at least 20 characters';
+      errs.coverLetter = 'Thư giới thiệu cần ít nhất 20 ký tự';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -73,37 +75,43 @@ export const ApplyJobScreen = ({ route, navigation }) => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.container}>
-        <Header title="Apply for Job" showBack />
+        <Header title="Ứng tuyển dự án" showBack />
 
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Target Job Info Card */}
           {job && (
             <View style={styles.jobBriefCard}>
               <Text style={styles.jobBriefTitle}>{job.title}</Text>
-              <Text style={styles.jobBriefBudget}>Ngân sách: {formatCurrency(job.budget, job.currency)}</Text>
+              <Text style={styles.jobBriefBudget}>
+                Ngân sách: {formatCurrency(job.budget, job.currency)}
+              </Text>
             </View>
           )}
 
           {isSuccess ? (
             <View style={styles.successContainer}>
               <Ionicons name="checkmark-circle" size={64} color={COLORS.success} />
-              <Text style={styles.successTitle}>Application Submitted!</Text>
+              <Text style={styles.successTitle}>Đã gửi đề xuất</Text>
               <Text style={styles.successMessage}>
-                Đã gửi đề xuất cho khách hàng. Khi đề xuất được duyệt và dự án bắt đầu, bạn có thể chat với khách hàng trong mục Tin nhắn.
+                Đã gửi đề xuất cho khách hàng. Khi đề xuất được duyệt và dự án bắt đầu, bạn có thể
+                chat với khách hàng trong mục Tin nhắn.
               </Text>
               <View style={styles.successBtnGroup}>
                 <CustomButton
-                  title="View My Applications"
+                  title="Xem đề xuất của tôi"
                   onPress={() => navigation.navigate('Applications')}
                   variant="primary"
                   size="large"
                   style={{ width: '100%', marginBottom: 10 }}
                 />
                 <CustomButton
-                  title="Back to Jobs"
+                  title="Quay lại tìm việc"
                   onPress={() => navigation.navigate('Jobs')}
                   variant="outline"
                   size="large"
@@ -113,13 +121,13 @@ export const ApplyJobScreen = ({ route, navigation }) => {
             </View>
           ) : (
             <View style={styles.formCard}>
-              <Text style={styles.formTitle}>Proposal Details</Text>
+              <Text style={styles.formTitle}>Thông tin đề xuất</Text>
 
               <CustomInput
-                label={`Báo giá (${job?.currency || 'USD'})`}
+                label={`Báo giá (${job?.currency || 'VND'})`}
                 value={proposedPrice}
                 onChangeText={setProposedPrice}
-                placeholder="e.g. 500"
+                placeholder="Ví dụ: 5000000"
                 icon="cash-outline"
                 keyboardType="numeric"
                 error={errors.proposedPrice}
@@ -127,20 +135,20 @@ export const ApplyJobScreen = ({ route, navigation }) => {
               />
 
               <CustomInput
-                label="Estimated Delivery Time"
+                label="Thời gian thực hiện dự kiến"
                 value={deliveryTime}
                 onChangeText={setDeliveryTime}
-                placeholder="e.g. 7 days, 2 weeks"
+                placeholder="Ví dụ: 7 ngày, 2 tuần"
                 icon="time-outline"
                 error={errors.deliveryTime}
                 required
               />
 
               <CustomInput
-                label="Cover Letter"
+                label="Thư giới thiệu"
                 value={coverLetter}
                 onChangeText={setCoverLetter}
-                placeholder="Introduce yourself, explain your relevant experience, and why you are the best fit for this project..."
+                placeholder="Giới thiệu kinh nghiệm và cách bạn sẽ thực hiện dự án…"
                 icon="create-outline"
                 multiline
                 numberOfLines={6}
@@ -149,7 +157,7 @@ export const ApplyJobScreen = ({ route, navigation }) => {
               />
 
               <CustomInput
-                label="Portfolio / GitHub Link (Optional)"
+                label="Portfolio / GitHub (tùy chọn)"
                 value={portfolioUrl}
                 onChangeText={setPortfolioUrl}
                 placeholder="https://github.com/yourprofile"
@@ -158,7 +166,7 @@ export const ApplyJobScreen = ({ route, navigation }) => {
 
               {!!errors.submit && <Text style={{ color: COLORS.danger }}>{errors.submit}</Text>}
               <CustomButton
-                title="Submit Application"
+                title="Gửi đề xuất"
                 onPress={handleSubmit}
                 loading={loading}
                 variant="primary"

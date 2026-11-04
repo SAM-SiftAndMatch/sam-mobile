@@ -1,22 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
-import UserAvatar from '../common/UserAvatar';
-import StatusBadge from '../common/StatusBadge';
-import CustomButton from '../common/CustomButton';
+import { UserAvatar } from '../common/UserAvatar';
+import { StatusBadge } from '../common/StatusBadge';
+import { CustomButton } from '../common/CustomButton';
 
 export const JobCard = ({ job, onPress, onApplyPress, showApplyButton = false }) => {
   if (!job) return null;
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      onPress={onPress}
-      style={styles.cardContainer}
-    >
+    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.cardContainer}>
       {/* Top Header: Customer Info & Status */}
       <View style={styles.topRow}>
         <View style={styles.customerInfo}>
@@ -104,15 +101,15 @@ const styles = StyleSheet.create({
     ...SHADOWS.light,
   },
   topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 10,
     marginBottom: 10,
   },
   customerInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    alignSelf: 'stretch',
   },
   customerTextCol: {
     marginLeft: 10,
@@ -124,6 +121,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   ratingRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 2,
@@ -184,6 +182,8 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   footerRow: {
+    flexWrap: 'wrap',
+    gap: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

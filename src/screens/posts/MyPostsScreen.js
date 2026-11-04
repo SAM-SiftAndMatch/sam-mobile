@@ -1,33 +1,25 @@
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
+import { selectUserProjects } from '../../features/marketplace/model/selectors';
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import StatusBadge from '../../components/common/StatusBadge';
-import CustomButton from '../../components/common/CustomButton';
-import EmptyState from '../../components/common/EmptyState';
-import { deleteJob } from '../../services/mockService';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { Header } from '../../components/common/Header';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { CustomButton } from '../../components/common/CustomButton';
+import { EmptyState } from '../../components/common/EmptyState';
 
 export const MyPostsScreen = ({ navigation }) => {
-  const { user } = useAuth();
-  const { jobs, refreshJobs } = useApp();
+  const { user, role } = useAuth();
+  const { jobs, applications, deleteJob } = useMarketplace();
 
   const [activeTab, setActiveTab] = useState('all'); // "all" | "open" | "draft" | "completed"
 
-  const myPosts = jobs.filter(
-    (job) => job.customerId === user?.id
-  );
+  const myPosts = selectUserProjects(jobs, applications, user);
 
   const filteredPosts = myPosts.filter((post) => {
     if (activeTab === 'all') return true;
@@ -35,21 +27,20 @@ export const MyPostsScreen = ({ navigation }) => {
   });
 
   const handleDelete = (id, title) => {
-    Alert.alert(
-      'Xóa dự án',
-      `Bạn có chắc muốn xóa "${title}"?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Xóa',
-          style: 'destructive',
-          onPress: async () => {
+    Alert.alert('Xóa dự án', `Bạn có chắc muốn xóa "${title}"?`, [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Xóa',
+        style: 'destructive',
+        onPress: async () => {
+          try {
             await deleteJob(id);
-            refreshJobs();
-          },
+          } catch (error) {
+            Alert.alert('Không thể xóa dự án', error.message);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -57,7 +48,7 @@ export const MyPostsScreen = ({ navigation }) => {
       <Header
         title="Dự án của tôi"
         subtitle={`${myPosts.length} dự án`}
-        rightIcon="add-circle-outline"
+        rightIcon={role === 'customer' ? 'add-circle-outline' : undefined}
         onRightPress={() => navigation.navigate('CreatePost')}
       />
 
@@ -70,7 +61,15 @@ export const MyPostsScreen = ({ navigation }) => {
             style={[styles.tabBtn, activeTab === tab && styles.activeTabBtn]}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {{ all: 'Tất cả', open: 'Đang tuyển', in_progress: 'Đang làm', draft: 'Bản nháp', completed: 'Hoàn thành' }[tab]}
+              {
+                {
+                  all: 'Tất cả',
+                  open: 'Đang tuyển',
+                  in_progress: 'Đang làm',
+                  draft: 'Bản nháp',
+                  completed: 'Hoàn thành',
+                }[tab]
+              }
             </Text>
           </TouchableOpacity>
         ))}
@@ -94,22 +93,24 @@ export const MyPostsScreen = ({ navigation }) => {
               <Text style={styles.budget}>{formatCurrency(item.budget, item.currency)}</Text>
               <View style={styles.applicantBadge}>
                 <Ionicons name="people-outline" size={14} color={COLORS.primary} />
-                <Text style={styles.applicantText}>
-                  {item.applicationsCount || 0} ứng viên
-                </Text>
+                <Text style={styles.applicantText}>{item.applicationsCount || 0} ứng viên</Text>
               </View>
             </View>
 
             {/* Action Buttons Row */}
             <View style={styles.actionRow}>
-              <CustomButton
-                title="Ứng viên"
-                onPress={() => navigation.navigate('Applications', { jobId: item.id })}
-                variant="primary"
-                size="small"
-                icon="people"
-                style={styles.actionBtn}
-              />
+              {role === 'customer' && (
+                <>
+                  <CustomButton
+                    title="Ứng viên"
+                    onPress={() => navigation.navigate('Applications', { jobId: item.id })}
+                    variant="primary"
+                    size="small"
+                    icon="people"
+                    style={styles.actionBtn}
+                  />
+                </>
+              )}
               <CustomButton
                 title="Chi tiết"
                 onPress={() => navigation.navigate('JobDetail', { jobId: item.id })}
@@ -117,12 +118,14 @@ export const MyPostsScreen = ({ navigation }) => {
                 size="small"
                 style={styles.actionBtn}
               />
-              <TouchableOpacity
-                onPress={() => handleDelete(item.id, item.title)}
-                style={styles.deleteBtn}
-              >
-                <Ionicons name="trash-outline" size={18} color={COLORS.danger} />
-              </TouchableOpacity>
+              {role === 'customer' && item.status === 'draft' && (
+                <TouchableOpacity
+                  onPress={() => handleDelete(item.id, item.title)}
+                  style={styles.deleteBtn}
+                >
+                  <Ionicons name="trash-outline" size={18} color={COLORS.danger} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}
@@ -131,8 +134,8 @@ export const MyPostsScreen = ({ navigation }) => {
             icon="document-text-outline"
             title="Chưa có dự án"
             message="Bạn chưa có dự án nào ở trạng thái này."
-            actionTitle="Đăng dự án"
-            onAction={() => navigation.navigate('CreatePost')}
+            actionTitle={role === 'customer' ? 'Đăng dự án' : 'Tìm việc'}
+            onAction={() => navigation.navigate(role === 'customer' ? 'CreatePost' : 'Jobs')}
           />
         }
       />
@@ -156,6 +159,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tabBtn: {
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: SIZES.radiusSm,

@@ -1,0 +1,21 @@
+// Names and colors follow sam-fe JobStatusBadge and workflow types.
+export const STATUS_APPEARANCE = {
+  OPEN: ['Đang chờ đề xuất', '#EFF6FF', '#1D4ED8'],
+  NEGOTIATING: ['Đang thương lượng', '#FEFCE8', '#A16207'],
+  AWAITING_PAYMENT: ['Chờ nạp tiền', '#FFFBEB', '#B45309'],
+  IN_PROGRESS: ['Đang thực hiện', '#FFF7ED', '#C2410C'],
+  COMPLETED: ['Hoàn thành', '#ECFDF5', '#047857'],
+  CANCELLED: ['Đã hủy', '#FEF2F2', '#B91C1C'],
+  CLOSED: ['Đã đóng', '#F1F5F9', '#475569'],
+  PENDING: ['Chờ phản hồi', '#FFFBEB', '#B45309'],
+  INVITED: ['Đã mời hợp tác', '#EFF6FF', '#1D4ED8'],
+  ACCEPTED: ['Đã xác nhận', '#ECFDF5', '#047857'],
+  REJECTED: ['Đã từ chối', '#FEF2F2', '#B91C1C'],
+  DRAFT: ['Bản nháp', '#F1F5F9', '#475569'],
+  ACTIVE: ['Có hiệu lực', '#ECFDF5', '#047857'],
+  TODO: ['Chưa bắt đầu', '#F1F5F9', '#475569'],
+  BLOCKED: ['Đang bị chặn', '#FEF2F2', '#B91C1C'],
+  SUBMITTED: ['Chờ nghiệm thu', '#F5F3FF', '#6D28D9'],
+  REOPENED: ['Cần làm lại', '#FFFBEB', '#B45309'],
+  REVISION_REQUESTED: ['Cần chỉnh sửa', '#FFFBEB', '#B45309'],
+};

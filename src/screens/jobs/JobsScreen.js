@@ -1,22 +1,16 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
+import { selectOpenJobs } from '../../features/marketplace/model/selectors';
+import React from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import SearchBar from '../../components/common/SearchBar';
-import JobCard from '../../components/job/JobCard';
-import EmptyState from '../../components/common/EmptyState';
-import LoadingState from '../../components/common/LoadingState';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { Header } from '../../components/common/Header';
+import { SearchBar } from '../../components/common/SearchBar';
+import { JobCard } from '../../components/job/JobCard';
+import { EmptyState } from '../../components/common/EmptyState';
+import { LoadingState } from '../../components/common/LoadingState';
 
 export const JobsScreen = ({ navigation }) => {
   const { role } = useAuth();
@@ -29,36 +23,18 @@ export const JobsScreen = ({ navigation }) => {
     selectedCategory,
     setSelectedCategory,
     refreshJobs,
-  } = useApp();
-
-  const [selectedStatus, setSelectedStatus] = useState('all'); // "all" | "open" | "completed"
+  } = useMarketplace();
 
   const isFreelancer = role === 'freelancer';
 
-  // Apply filters
-  const filteredJobs = jobs.filter((job) => {
-    if (job.status === 'draft') return false;
-    const matchesCategory =
-      selectedCategory === 'All' || job.category === selectedCategory;
-
-    const matchesStatus =
-      selectedStatus === 'all' || job.status === selectedStatus;
-
-    const matchesSearch =
-      !searchQuery ||
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    return matchesCategory && matchesStatus && matchesSearch;
-  });
+  const filteredJobs = selectOpenJobs(jobs, searchQuery, selectedCategory);
 
   return (
     <View style={styles.container}>
       <Header
         title="Khám phá dự án"
         subtitle={`${filteredJobs.length} dự án`}
-        rightIcon={!isFreelancer ? "add-circle-outline" : undefined}
+        rightIcon={!isFreelancer ? 'add-circle-outline' : undefined}
         onRightPress={!isFreelancer ? () => navigation.navigate('CreatePost') : undefined}
       />
 
@@ -78,17 +54,9 @@ export const JobsScreen = ({ navigation }) => {
         >
           <TouchableOpacity
             onPress={() => setSelectedCategory('All')}
-            style={[
-              styles.pill,
-              selectedCategory === 'All' && styles.selectedPill,
-            ]}
+            style={[styles.pill, selectedCategory === 'All' && styles.selectedPill]}
           >
-            <Text
-              style={[
-                styles.pillText,
-                selectedCategory === 'All' && styles.selectedPillText,
-              ]}
-            >
+            <Text style={[styles.pillText, selectedCategory === 'All' && styles.selectedPillText]}>
               Tất cả
             </Text>
           </TouchableOpacity>
@@ -96,46 +64,16 @@ export const JobsScreen = ({ navigation }) => {
             <TouchableOpacity
               key={cat.id}
               onPress={() => setSelectedCategory(cat.name)}
-              style={[
-                styles.pill,
-                selectedCategory === cat.name && styles.selectedPill,
-              ]}
+              style={[styles.pill, selectedCategory === cat.name && styles.selectedPill]}
             >
               <Text
-                style={[
-                  styles.pillText,
-                  selectedCategory === cat.name && styles.selectedPillText,
-                ]}
+                style={[styles.pillText, selectedCategory === cat.name && styles.selectedPillText]}
               >
                 {cat.name}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
-
-        {/* Status Pills */}
-        <View style={styles.statusFilterRow}>
-          <Text style={styles.statusFilterLabel}>Trạng thái:</Text>
-          {['all', 'open', 'draft'].map((status) => (
-            <TouchableOpacity
-              key={status}
-              onPress={() => setSelectedStatus(status)}
-              style={[
-                styles.statusPill,
-                selectedStatus === status && styles.selectedStatusPill,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.statusPillText,
-                  selectedStatus === status && styles.selectedStatusPillText,
-                ]}
-              >
-                {{ all: 'Tất cả', open: 'Đang tuyển', draft: 'Bản nháp' }[status]}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
       </View>
 
       {/* Main Job FlatList */}
@@ -166,7 +104,6 @@ export const JobsScreen = ({ navigation }) => {
               onAction={() => {
                 setSearchQuery('');
                 setSelectedCategory('All');
-                setSelectedStatus('all');
               }}
             />
           }
@@ -194,6 +131,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pill: {
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: SIZES.radiusFull,
@@ -213,37 +152,6 @@ const styles = StyleSheet.create({
   selectedPillText: {
     color: COLORS.white,
     fontWeight: '700',
-  },
-  statusFilterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  statusFilterLabel: {
-    fontSize: SIZES.caption,
-    color: COLORS.textMuted,
-    fontWeight: '700',
-  },
-  statusPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 6,
-    backgroundColor: COLORS.surface,
-  },
-  selectedStatusPill: {
-    backgroundColor: COLORS.primaryBackground,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-  },
-  statusPillText: {
-    fontSize: SIZES.tiny,
-    color: COLORS.textMuted,
-    fontWeight: '700',
-  },
-  selectedStatusPillText: {
-    color: COLORS.primary,
   },
   listContent: {
     padding: SIZES.padding,
