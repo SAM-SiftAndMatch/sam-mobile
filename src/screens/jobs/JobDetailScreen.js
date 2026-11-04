@@ -1,37 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useChat } from '../../features/chat/useChat';
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
+import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, StyleSheet, ScrollView, Alert, useWindowDimensions } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 import { formatCurrency, formatDate } from '../../utils/formatCurrency';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
-import Header from '../../components/common/Header';
-import UserAvatar from '../../components/common/UserAvatar';
-import StatusBadge from '../../components/common/StatusBadge';
-import CustomButton from '../../components/common/CustomButton';
-import LoadingState from '../../components/common/LoadingState';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { Header } from '../../components/common/Header';
+import { UserAvatar } from '../../components/common/UserAvatar';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { CustomButton } from '../../components/common/CustomButton';
+import { LoadingState } from '../../components/common/LoadingState';
 
 export const JobDetailScreen = ({ route, navigation }) => {
+  const { width, fontScale } = useWindowDimensions();
+  const compact = width < 380 || fontScale > 1.15;
+  const insets = useSafeAreaInsets();
   const { jobId } = route.params || {};
   const { user, role } = useAuth();
-  const { jobs, applications, openMessages } = useApp();
+  const { jobs, applications } = useMarketplace();
+  const { openMessages } = useChat();
 
-  const [job, setJob] = useState(null);
-
-  useEffect(() => {
-    if (jobId) {
-      const found = jobs.find((j) => j.id === jobId);
-      if (found) setJob(found);
-    }
-  }, [jobId, jobs]);
+  const job = jobs.find((j) => j.id === jobId);
 
   if (!job) {
     return (
@@ -47,14 +40,18 @@ export const JobDetailScreen = ({ route, navigation }) => {
 
   // Check if current freelancer has already applied
   const existingApp = applications.find(
-    (app) => app.jobId === job.id && app.freelancerId === user?.id
+    (app) => app.jobId === job.id && app.freelancerId === user?.id,
   );
 
   return (
     <View style={styles.container}>
       <Header title="Chi tiết dự án" showBack />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={compact ? { width: '100%' } : { flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Main Job Overview Card */}
         <View style={styles.card}>
           <View style={styles.categoryRow}>
@@ -62,7 +59,7 @@ export const JobDetailScreen = ({ route, navigation }) => {
               <Ionicons name="pricetag-outline" size={12} color={COLORS.primary} />
               <Text style={styles.categoryText}>{job.category}</Text>
             </View>
-            <StatusBadge status={job.status} />
+            <StatusBadge status={job.status} style={{ flexShrink: 0, maxWidth: '100%' }} />
           </View>
 
           <Text style={styles.title}>{job.title}</Text>
@@ -138,9 +135,20 @@ export const JobDetailScreen = ({ route, navigation }) => {
       </ScrollView>
 
       {/* Bottom Sticky Action Footer */}
-      <View style={styles.footerBar}>
+      <View style={[styles.footerBar, { paddingBottom: Math.max(14, insets.bottom) }]}>
         {job.status === 'in_progress' && (isOwner || existingApp?.status === 'accepted') ? (
-          <CustomButton title="Mở chat dự án" icon="chatbubbles-outline" onPress={() => openMessages((existingApp || applications.find((app) => app.jobId === job.id && app.status === 'accepted'))?.id)} />
+          <CustomButton
+            title="Mở chat dự án"
+            icon="chatbubbles-outline"
+            onPress={() =>
+              openMessages(
+                (
+                  existingApp ||
+                  applications.find((app) => app.jobId === job.id && app.status === 'accepted')
+                )?.id,
+              )
+            }
+          />
         ) : isFreelancer ? (
           existingApp ? (
             <View style={styles.appliedBanner}>
@@ -161,19 +169,27 @@ export const JobDetailScreen = ({ route, navigation }) => {
             />
           )
         ) : (
-          <View style={styles.customerActionRow}>
+          <View
+            style={[
+              styles.customerActionRow,
+              compact && { flexDirection: 'column', alignItems: 'stretch' },
+            ]}
+          >
             <CustomButton
               title="Xem ứng viên"
               onPress={() => navigation.navigate('Applications', { jobId: job.id })}
               variant="primary"
               size="large"
               icon="people-outline"
-              style={{ flex: 1 }}
+              style={compact ? { width: '100%' } : { flex: 1 }}
             />
             {isOwner && (
               <CustomButton
                 title="Chỉnh sửa"
-                onPress={() => Alert.alert('Chỉnh sửa dự án', 'Chức năng chỉnh sửa đang được phát triển.')}
+                style={compact ? { width: '100%' } : undefined}
+                onPress={() =>
+                  Alert.alert('Chỉnh sửa dự án', 'Chức năng chỉnh sửa đang được phát triển.')
+                }
                 variant="outline"
                 size="large"
                 icon="create-outline"
@@ -193,7 +209,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: SIZES.padding,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
   card: {
     backgroundColor: COLORS.white,
@@ -205,6 +221,8 @@ const styles = StyleSheet.create({
     ...SHADOWS.light,
   },
   categoryRow: {
+    flexWrap: 'wrap',
+    gap: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -232,9 +250,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   budgetBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
+    flexDirection: 'column',
+    gap: 14,
+    alignItems: 'stretch',
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
     paddingVertical: 14,
@@ -258,8 +276,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   budgetDivider: {
-    width: 1,
-    height: 30,
+    height: 1,
     backgroundColor: COLORS.border,
   },
   sectionCard: {
@@ -282,6 +299,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   customerCol: {
+    flex: 1,
+    minWidth: 0,
     marginLeft: 12,
   },
   customerName: {
@@ -290,6 +309,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
   ratingRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 3,
@@ -342,10 +362,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footerBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: COLORS.white,
     paddingHorizontal: SIZES.padding,
     paddingVertical: 14,
@@ -371,6 +387,7 @@ const styles = StyleSheet.create({
     color: COLORS.success,
   },
   customerActionRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     gap: 10,
   },

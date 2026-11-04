@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -9,13 +8,14 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 import { validateEmail, validatePassword, validateRequired } from '../../utils/validation';
-import CustomInput from '../../components/common/CustomInput';
-import CustomButton from '../../components/common/CustomButton';
-import { useAuth } from '../../context/AuthContext';
+import { CustomInput } from '../../components/common/CustomInput';
+import { CustomButton } from '../../components/common/CustomButton';
+import { useAuth } from '../../features/auth/AuthProvider';
 
 export const RegisterScreen = ({ navigation }) => {
   const { register, isLoading } = useAuth();
@@ -30,16 +30,16 @@ export const RegisterScreen = ({ navigation }) => {
   const validateForm = () => {
     let errs = {};
     if (!validateRequired(name)) {
-      errs.name = 'Full name is required';
+      errs.name = 'Vui lòng nhập họ và tên';
     }
     if (!validateEmail(email)) {
-      errs.email = 'Please enter a valid email address';
+      errs.email = 'Vui lòng nhập email hợp lệ';
     }
     if (!validatePassword(password)) {
-      errs.password = 'Password must be at least 6 characters';
+      errs.password = 'Mật khẩu cần ít nhất 6 ký tự';
     }
     if (password !== confirmPassword) {
-      errs.confirmPassword = 'Passwords do not match';
+      errs.confirmPassword = 'Mật khẩu nhập lại chưa khớp';
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -54,38 +54,37 @@ export const RegisterScreen = ({ navigation }) => {
         password,
         role,
       });
-      Alert.alert('Registration Successful', `Welcome to WorkMarket as a ${role}!`);
+      Alert.alert('Đăng ký thành công', `Chào mừng bạn đến với SAM!`);
     } catch (err) {
-      Alert.alert('Registration Failed', err.message || 'Error creating account');
+      Alert.alert('Chưa thể đăng ký', err.message || 'Vui lòng thử lại');
     }
   };
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Quay lại"
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
           <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Create Account 🚀</Text>
-        <Text style={styles.subtitle}>Join thousands of professionals & employers.</Text>
+        <Text style={styles.title}>Tạo tài khoản SAM</Text>
+        <Text style={styles.subtitle}>Kết nối và làm việc cùng đối tác phù hợp.</Text>
 
         {/* Role Picker Selector */}
-        <Text style={styles.roleLabel}>I want to join as a: *</Text>
+        <Text style={styles.roleLabel}>Tôi muốn tham gia với vai trò: *</Text>
         <View style={styles.roleContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => setRole('freelancer')}
-            style={[
-              styles.roleCard,
-              role === 'freelancer' && styles.selectedRoleCard,
-            ]}
+            style={[styles.roleCard, role === 'freelancer' && styles.selectedRoleCard]}
           >
             <View
               style={[
@@ -99,31 +98,18 @@ export const RegisterScreen = ({ navigation }) => {
                 color={role === 'freelancer' ? COLORS.white : COLORS.primary}
               />
             </View>
-            <Text
-              style={[
-                styles.roleTitle,
-                role === 'freelancer' && styles.selectedRoleText,
-              ]}
-            >
+            <Text style={[styles.roleTitle, role === 'freelancer' && styles.selectedRoleText]}>
               Freelancer
             </Text>
-            <Text
-              style={[
-                styles.roleSub,
-                role === 'freelancer' && styles.selectedRoleSub,
-              ]}
-            >
-              Find jobs & build projects
+            <Text style={[styles.roleSub, role === 'freelancer' && styles.selectedRoleSub]}>
+              Tìm việc và thực hiện dự án
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => setRole('customer')}
-            style={[
-              styles.roleCard,
-              role === 'customer' && styles.selectedRoleCardCustomer,
-            ]}
+            style={[styles.roleCard, role === 'customer' && styles.selectedRoleCardCustomer]}
           >
             <View
               style={[
@@ -137,21 +123,11 @@ export const RegisterScreen = ({ navigation }) => {
                 color={role === 'customer' ? COLORS.white : COLORS.customerBadge}
               />
             </View>
-            <Text
-              style={[
-                styles.roleTitle,
-                role === 'customer' && styles.selectedRoleText,
-              ]}
-            >
-              Customer
+            <Text style={[styles.roleTitle, role === 'customer' && styles.selectedRoleText]}>
+              Khách hàng
             </Text>
-            <Text
-              style={[
-                styles.roleSub,
-                role === 'customer' && styles.selectedRoleSub,
-              ]}
-            >
-              Post jobs & hire talent
+            <Text style={[styles.roleSub, role === 'customer' && styles.selectedRoleSub]}>
+              Đăng dự án và tìm chuyên gia
             </Text>
           </TouchableOpacity>
         </View>
@@ -159,7 +135,7 @@ export const RegisterScreen = ({ navigation }) => {
         {/* Form Inputs */}
         <View style={styles.form}>
           <CustomInput
-            label="Full Name"
+            label="Họ và tên"
             value={name}
             onChangeText={setName}
             placeholder="John Doe"
@@ -169,40 +145,43 @@ export const RegisterScreen = ({ navigation }) => {
           />
 
           <CustomInput
-            label="Email Address"
+            label="Địa chỉ email"
             value={email}
             onChangeText={setEmail}
             placeholder="john@example.com"
             icon="mail-outline"
             keyboardType="email-address"
+            autoComplete="email"
             error={errors.email}
             required
           />
 
           <CustomInput
-            label="Password"
+            label="Mật khẩu"
             value={password}
             onChangeText={setPassword}
-            placeholder="At least 6 characters"
+            placeholder="Ít nhất 6 ký tự"
             icon="lock-closed-outline"
             isPassword
+            autoComplete="new-password"
             error={errors.password}
             required
           />
 
           <CustomInput
-            label="Confirm Password"
+            label="Nhập lại mật khẩu"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            placeholder="Re-enter password"
+            placeholder="Nhập lại mật khẩu"
             icon="shield-checkmark-outline"
             isPassword
+            autoComplete="new-password"
             error={errors.confirmPassword}
             required
           />
 
           <CustomButton
-            title={`Register as ${role === 'freelancer' ? 'Freelancer' : 'Customer'}`}
+            title={`Tạo tài khoản`}
             onPress={handleRegister}
             loading={isLoading}
             variant="primary"
@@ -212,9 +191,13 @@ export const RegisterScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.footerRow}>
-          <Text style={styles.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.loginLink}>Sign In</Text>
+          <Text style={styles.footerText}>Bạn đã có tài khoản? </Text>
+          <TouchableOpacity
+            accessibilityRole="button"
+            style={{ minHeight: 44, justifyContent: 'center' }}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.loginLink}>Đăng nhập</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -229,6 +212,10 @@ const styles = StyleSheet.create({
     padding: SIZES.paddingLg,
   },
   backBtn: {
+    alignSelf: 'flex-start',
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
     marginTop: 10,
     marginBottom: 16,
   },
@@ -311,6 +298,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   footerRow: {
+    alignItems: 'center',
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'center',
     marginVertical: 14,

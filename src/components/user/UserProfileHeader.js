@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { formatCurrency } from '../../utils/formatCurrency';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
-import UserAvatar from '../common/UserAvatar';
+import { UserAvatar } from '../common/UserAvatar';
 
 export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
   if (!user) return null;
@@ -24,24 +26,29 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
               </View>
             )}
           </View>
-          <Text style={styles.userTitle}>{user.title || (isFreelancer ? 'Freelancer' : 'Customer')}</Text>
+          <Text style={styles.userTitle}>
+            {user.title || (isFreelancer ? 'Freelancer' : 'Khách hàng')}
+          </Text>
 
           <View style={styles.roleBadgeContainer}>
-            <View style={[styles.roleBadge, isFreelancer ? styles.freelancerBadge : styles.customerBadge]}>
+            <View
+              style={[
+                styles.roleBadge,
+                isFreelancer ? styles.freelancerBadge : styles.customerBadge,
+              ]}
+            >
               <Ionicons
                 name={isFreelancer ? 'briefcase-outline' : 'business-outline'}
                 size={12}
                 color={COLORS.white}
               />
-              <Text style={styles.roleBadgeText}>
-                {isFreelancer ? 'Freelancer' : 'Customer (Hiring)'}
-              </Text>
+              <Text style={styles.roleBadgeText}>{isFreelancer ? 'Freelancer' : 'Khách hàng'}</Text>
             </View>
 
             {onSwitchRolePress && (
               <TouchableOpacity onPress={onSwitchRolePress} style={styles.switchRoleBtn}>
                 <Ionicons name="swap-horizontal" size={14} color={COLORS.primary} />
-                <Text style={styles.switchText}>Switch Role</Text>
+                <Text style={styles.switchText}>Đổi vai trò</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -54,19 +61,20 @@ export const UserProfileHeader = ({ user, onEditPress, onSwitchRolePress }) => {
       <View style={styles.statsContainer}>
         <View style={styles.statBox}>
           <Text style={styles.statNumber}>{user.rating || '5.0'}</Text>
-          <Text style={styles.statLabel}>Rating ★</Text>
+          <Text style={styles.statLabel}>Đánh giá ★</Text>
         </View>
-        <View style={styles.statDivider} />
         <View style={styles.statBox}>
           <Text style={styles.statNumber}>{user.completedJobs || 0}</Text>
-          <Text style={styles.statLabel}>Completed</Text>
+          <Text style={styles.statLabel}>Hoàn thành</Text>
         </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statBox}>
+        <View style={[styles.statBox, styles.moneyStat]}>
           <Text style={styles.statNumber}>
-            {isFreelancer ? `$${user.hourlyRate || 50}/h` : `$${(user.totalSpent / 1000).toFixed(1)}k`}
+            {formatCurrency(
+              isFreelancer ? user.hourlyRate : user.totalSpent,
+              user.currency || 'VND',
+            )}
           </Text>
-          <Text style={styles.statLabel}>{isFreelancer ? 'Hourly Rate' : 'Total Spent'}</Text>
+          <Text style={styles.statLabel}>{isFreelancer ? 'Giá theo giờ' : 'Đã chi'}</Text>
         </View>
       </View>
     </View>
@@ -94,6 +102,7 @@ const styles = StyleSheet.create({
     marginLeft: 14,
   },
   titleRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -170,16 +179,27 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    flexWrap: 'wrap',
+    gap: 12,
     marginTop: 16,
     paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
   statBox: {
+    flexGrow: 1,
+    flexBasis: '40%',
+    minWidth: 0,
     alignItems: 'center',
   },
+  moneyStat: {
+    flexBasis: '100%',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
   statNumber: {
+    textAlign: 'center',
     fontSize: SIZES.h4,
     fontWeight: '800',
     color: COLORS.textPrimary,
@@ -188,11 +208,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.tiny,
     color: COLORS.textMuted,
     marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    height: 24,
-    backgroundColor: COLORS.border,
   },
 });
 

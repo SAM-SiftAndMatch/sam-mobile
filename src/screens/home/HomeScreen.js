@@ -1,383 +1,182 @@
+import { useChat } from '../../features/chat/useChat';
+import { useNotifications } from '../../features/notifications/NotificationsProvider';
+import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Text from '../../design/Text';
+import BrandLogo from '../../components/common/BrandLogo';
+import { CustomButton } from '../../components/common/CustomButton';
+import { JobCard } from '../../components/job/JobCard';
+import { SectionHeader } from '../../components/common/SectionHeader';
+import { LoadingState } from '../../components/common/LoadingState';
+import { ErrorState } from '../../components/common/ErrorState';
+import { EmptyState } from '../../components/common/EmptyState';
 import { COLORS } from '../../constants/colors';
-import { SIZES, SHADOWS } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
-import UserAvatar from '../../components/common/UserAvatar';
-import SectionHeader from '../../components/common/SectionHeader';
-import CategoryCard from '../../components/premium/CategoryCard';
-import JobCard from '../../components/job/JobCard';
-import LoadingState from '../../components/common/LoadingState';
-import ErrorState from '../../components/common/ErrorState';
+import { useAuth } from '../../features/auth/AuthProvider';
 
-export const HomeScreen = ({ navigation }) => {
+export default function HomeScreen({ navigation }) {
   const { user, role } = useAuth();
-  const {
-    jobs,
-    categories,
-    loading,
-    error,
-    selectedCategory,
-    setSelectedCategory,
-    unreadCount,
-    refreshJobs,
-    openMessages,
-    chatUnreadCount,
-  } = useApp();
-
-  const isFreelancer = role === 'freelancer';
-
-  // Home recommendations only follow the selected category.
-  const filteredJobs = jobs.filter((job) => {
-    if (job.status !== 'open') return false;
-    const matchesCat =
-      selectedCategory === 'All' || job.category === selectedCategory;
-    return matchesCat;
-  });
-
-  // Mock popular freelancers list for home page
-  const popularFreelancers = [
-    {
-      id: 'f1',
-      name: 'Marcus Vance',
-      title: 'UI/UX Designer',
-      rating: 4.9,
-      rate: '$55/h',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-      id: 'f2',
-      name: 'Sophia Chen',
-      title: 'React Native Expert',
-      rating: 5.0,
-      rate: '$70/h',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-      id: 'f3',
-      name: 'David Kim',
-      title: 'Full Stack Node.js',
-      rating: 4.8,
-      rate: '$60/h',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
-    },
-  ];
-
+  const { jobs, applications, loading, error, refreshJobs } = useMarketplace();
+  const { unreadCount } = useNotifications();
+  const { conversations } = useChat();
+  const freelancer = role === 'freelancer';
+  const owned = jobs.filter((j) => j.customerId === user?.id);
+  const active = freelancer
+    ? conversations.map((c) => c.project)
+    : owned.filter((j) => j.status === 'in_progress');
+  const pending = applications.filter((a) => a.status === 'pending').length;
+  const cards = freelancer
+    ? jobs.filter((j) => j.status === 'open').slice(0, 4)
+    : owned.slice(0, 4);
   return (
-    <View style={styles.container}>
-      {/* Top Navigation Bar */}
-      <SafeAreaView edges={['top', 'left', 'right']} style={styles.topHeader}>
-        <View style={styles.greetingRow}>
-          <UserAvatar uri={user?.avatar} name={user?.name || 'Alex'} size={44} showOnline />
-          <View style={styles.greetingCol}>
-            <Text style={styles.greetingSub}>
-              {new Date().getHours() < 12 ? 'Good morning,' : 'Good afternoon,'}
-            </Text>
-            <Text style={styles.userName}>{user?.name || 'Alex Johnson'}</Text>
-          </View>
-        </View>
-
-        <View style={styles.headerActions}>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Tin nhắn${chatUnreadCount ? `, ${chatUnreadCount} tin chưa đọc` : ''}`} onPress={() => openMessages()} style={styles.notifBtn}>
-          <Ionicons name="chatbubbles-outline" size={24} color={COLORS.primary} />
-          {chatUnreadCount > 0 && <View style={styles.badgeCircle}><Text style={styles.badgeText}>{chatUnreadCount > 99 ? '99+' : chatUnreadCount}</Text></View>}
-        </TouchableOpacity>
+    <View style={styles.page}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.header}>
+        <BrandLogo tagline />
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={`Thông báo, ${unreadCount} chưa đọc`}
           onPress={() => navigation.navigate('Notifications')}
-          style={styles.notifBtn}
+          style={styles.icon}
         >
-          <Ionicons name="notifications-outline" size={24} color={COLORS.textPrimary} />
-          {unreadCount > 0 && (
-            <View style={styles.badgeCircle}>
-              <Text style={styles.badgeText}>{unreadCount}</Text>
-            </View>
-          )}
+          <Ionicons name="notifications-outline" size={23} color={COLORS.textPrimary} />
+          {unreadCount > 0 && <View style={styles.dot} />}
         </TouchableOpacity>
-        </View>
       </SafeAreaView>
-
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <LinearGradient colors={['#EEEBFF', '#E9F5FF']} style={styles.hero}>
-          <Text style={styles.brand}>SAM<Text style={{ color: COLORS.cyan }}>.</Text></Text>
-          <Text style={styles.heroTitle}>Kết nối Freelancer{'\n'}<Text style={{ color: COLORS.primary }}>phù hợp nhất</Text> cho dự án</Text>
-          <Text style={styles.heroDescription}>Biến ý tưởng thành hiện thực cùng cộng đồng chuyên gia tài năng.</Text>
-        </LinearGradient>
-        {/* Premium Promotion Banner */}
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => navigation.navigate('Premium')}
-          style={styles.premiumBanner}
-        >
-          <View style={styles.bannerContent}>
-            <View style={styles.bannerTag}>
-              <Ionicons name="sparkles" size={12} color={COLORS.accent} />
-              <Text style={styles.bannerTagText}>SAM PRO</Text>
-            </View>
-            <Text style={styles.bannerTitle}>
-              {isFreelancer ? 'Get 3x More Job Views & Proposals' : 'Hire Verified Top 1% Freelancers'}
-            </Text>
-            <Text style={styles.bannerSub}>Upgrade to Premium for featured priority visibility</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={24} color={COLORS.white} />
-        </TouchableOpacity>
-
-        {/* Categories Horizontal Scroll */}
-        <SectionHeader
-          title="Categories"
-          actionTitle="See All"
-          onAction={() => navigation.navigate('Jobs')}
-        />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesScroll}
-        >
-          <CategoryCard
-            category={{ name: 'All', icon: 'grid-outline', jobsCount: jobs.length }}
-            isSelected={selectedCategory === 'All'}
-            onPress={() => setSelectedCategory('All')}
-          />
-          {categories.map((cat) => (
-            <CategoryCard
-              key={cat.id}
-              category={cat}
-              isSelected={selectedCategory === cat.name}
-              onPress={() => setSelectedCategory(cat.name)}
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.eyebrow}>
+          {freelancer ? 'KHÔNG GIAN FREELANCER' : 'KHÔNG GIAN KHÁCH HÀNG'}
+        </Text>
+        <Text style={styles.title}>Xin chào, {user?.name?.split(' ')[0] || 'bạn'}.</Text>
+        <Text style={styles.subtitle}>
+          {freelancer
+            ? 'Tìm cơ hội phù hợp và theo dõi công việc của bạn.'
+            : 'Biến ý tưởng thành dự án cùng chuyên gia phù hợp.'}
+        </Text>
+        <View style={styles.prompt}>
+          <View style={styles.promptIcon}>
+            <Ionicons
+              name={freelancer ? 'search-outline' : 'sparkles-outline'}
+              size={24}
+              color={COLORS.primary}
             />
-          ))}
-        </ScrollView>
-
-        {/* Popular Freelancers (Highlight Section) */}
-        <SectionHeader title="Top Rated Freelancers" />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.freelancersScroll}
-        >
-          {popularFreelancers.map((freelancer) => (
-            <View key={freelancer.id} style={styles.freelancerCard}>
-              <Image source={{ uri: freelancer.avatar }} style={styles.freelancerAvatar} />
-              <Text style={styles.freelancerName}>{freelancer.name}</Text>
-              <Text style={styles.freelancerTitle}>{freelancer.title}</Text>
-              <View style={styles.freelancerMeta}>
-                <Ionicons name="star" size={12} color={COLORS.accent} />
-                <Text style={styles.freelancerRating}>{freelancer.rating}</Text>
-                <Text style={styles.freelancerRate}>{freelancer.rate}</Text>
-              </View>
+          </View>
+          <Text style={styles.promptTitle}>
+            {freelancer ? 'Cơ hội tiếp theo của bạn' : 'Bạn muốn xây dựng điều gì?'}
+          </Text>
+          <Text style={styles.subtitle}>
+            {freelancer
+              ? 'Khám phá dự án theo kỹ năng và ngân sách.'
+              : 'Bắt đầu từ mục tiêu, ngân sách và yêu cầu của dự án.'}
+          </Text>
+          <CustomButton
+            title={freelancer ? 'Khám phá việc làm' : 'Tạo dự án mới'}
+            icon={freelancer ? 'arrow-forward' : 'add'}
+            onPress={() => navigation.navigate(freelancer ? 'Jobs' : 'CreatePost')}
+            style={{ marginTop: 18 }}
+          />
+        </View>
+        <View style={styles.stats}>
+          {[
+            [active.length, 'Đang thực hiện', 'layers-outline'],
+            [pending, freelancer ? 'Đề xuất đang chờ' : 'Ứng viên đang chờ', 'paper-plane-outline'],
+          ].map(([value, label, icon]) => (
+            <View key={label} style={styles.stat}>
+              <Ionicons name={icon} color={COLORS.primary} size={21} />
+              <Text style={styles.number}>{value}</Text>
+              <Text style={styles.statLabel}>{label}</Text>
             </View>
           ))}
-        </ScrollView>
-
-        {/* Recommended Jobs List */}
+        </View>
         <SectionHeader
-          title={selectedCategory === 'All' ? 'Dự án dành cho bạn' : `Dự án ${selectedCategory.toLowerCase()}`}
+          title={freelancer ? 'Dự án mới nhất' : 'Dự án của bạn'}
           actionTitle="Xem tất cả"
-          onAction={() => navigation.navigate('Jobs')}
+          onAction={() => navigation.navigate(freelancer ? 'Jobs' : 'MyPosts')}
         />
-
         {loading ? (
-          <LoadingState message="Loading latest job opportunities..." />
+          <LoadingState />
         ) : error ? (
           <ErrorState message={error} onRetry={refreshJobs} />
-        ) : filteredJobs.length === 0 ? (
-          <View style={styles.emptyBox}>
-            <Text style={styles.emptyText}>No jobs available in this category.</Text>
-          </View>
-        ) : (
-          filteredJobs.slice(0, 4).map((job) => (
+        ) : cards.length ? (
+          cards.map((job) => (
             <JobCard
               key={job.id}
               job={job}
               onPress={() => navigation.navigate('JobDetail', { jobId: job.id })}
-              showApplyButton={isFreelancer}
-              onApplyPress={() => navigation.navigate('ApplyJob', { job })}
             />
           ))
+        ) : (
+          <EmptyState
+            icon="briefcase-outline"
+            title="Sẵn sàng cho dự án đầu tiên"
+            message="Các dự án của bạn sẽ xuất hiện tại đây."
+          />
         )}
       </ScrollView>
     </View>
   );
-};
-
+}
 const styles = StyleSheet.create({
-  hero: { padding: 24, gap: 14, margin: 16, borderRadius: 24 },
-  brand: { fontSize: 24, fontWeight: '900', color: COLORS.primary },
-  heroTitle: { fontSize: 26, fontWeight: '800', lineHeight: 35, color: COLORS.textPrimary },
-  heroDescription: { fontSize: 14, lineHeight: 23, color: COLORS.textSecondary, marginBottom: 4 },
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  topHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SIZES.padding,
-    paddingTop: 16,
-    paddingBottom: 12,
+  page: { flex: 1, backgroundColor: COLORS.background },
+  header: {
     backgroundColor: COLORS.white,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-  },
-  greetingRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  greetingCol: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  greetingSub: {
-    fontSize: SIZES.caption,
-    color: COLORS.textMuted,
-  },
-  userName: {
-    fontSize: SIZES.h3,
-    fontWeight: '800',
-    color: COLORS.textPrimary,
-  },
-  notifBtn: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: COLORS.surface,
-  },
-  headerActions: { flexDirection: 'row', gap: 8, marginLeft: 8 },
-  badgeCircle: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-    backgroundColor: COLORS.danger,
-    borderRadius: 10,
-    minWidth: 18,
-    height: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-  },
-  badgeText: {
-    color: COLORS.white,
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  scrollContent: {
-    paddingBottom: 24,
-  },
-  premiumBanner: {
-    backgroundColor: COLORS.primaryDark,
-    borderRadius: SIZES.radiusLg,
-    marginHorizontal: SIZES.padding,
-    marginTop: 14,
-    padding: SIZES.padding,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...SHADOWS.medium,
   },
-  bannerContent: {
-    flex: 1,
-    paddingRight: 10,
+  icon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  dot: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.danger,
   },
-  bannerTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-    gap: 4,
-    marginBottom: 6,
+  content: { padding: 20, paddingBottom: 32 },
+  eyebrow: {
+    fontSize: 11,
+    color: COLORS.primary,
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginTop: 12,
   },
-  bannerTagText: {
-    color: COLORS.accent,
-    fontSize: SIZES.tiny,
-    fontWeight: '800',
-  },
-  bannerTitle: {
-    color: COLORS.white,
-    fontSize: SIZES.h4,
-    fontWeight: '800',
-    lineHeight: 20,
-  },
-  bannerSub: {
-    color: COLORS.primaryBackground,
-    fontSize: SIZES.tiny,
-    marginTop: 4,
-  },
-  categoriesScroll: {
-    paddingLeft: SIZES.padding,
-    paddingRight: SIZES.padding / 2,
-    paddingBottom: 4,
-  },
-  freelancersScroll: {
-    paddingLeft: SIZES.padding,
-    paddingRight: SIZES.padding / 2,
-  },
-  freelancerCard: {
+  title: { fontSize: 28, fontWeight: '700', color: COLORS.textPrimary, marginVertical: 10 },
+  subtitle: { fontSize: 14, lineHeight: 23, color: COLORS.textSecondary },
+  prompt: {
+    marginTop: 24,
+    marginBottom: 16,
+    padding: 20,
     backgroundColor: COLORS.white,
-    borderRadius: SIZES.radius,
-    padding: 12,
-    marginRight: 10,
-    alignItems: 'center',
-    width: 125,
     borderWidth: 1,
     borderColor: COLORS.border,
-    ...SHADOWS.light,
+    borderRadius: 12,
   },
-  freelancerAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginBottom: 6,
-  },
-  freelancerName: {
-    fontSize: SIZES.body3,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    textAlign: 'center',
-  },
-  freelancerTitle: {
-    fontSize: SIZES.tiny,
-    color: COLORS.textMuted,
-    textAlign: 'center',
-    marginBottom: 6,
-  },
-  freelancerMeta: {
-    flexDirection: 'row',
+  promptIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: COLORS.primaryBackground,
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'center',
+    marginBottom: 14,
   },
-  freelancerRating: {
-    fontSize: SIZES.caption,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
+  promptTitle: { fontSize: 19, fontWeight: '700', color: COLORS.textPrimary, marginBottom: 8 },
+  stats: { flexDirection: 'row', gap: 12, marginBottom: 24 },
+  stat: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
   },
-  freelancerRate: {
-    fontSize: SIZES.tiny,
-    color: COLORS.secondary,
-    fontWeight: '700',
-    marginLeft: 4,
-  },
-  emptyBox: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  emptyText: {
-    color: COLORS.textMuted,
-    fontSize: SIZES.body3,
-  },
+  number: { fontSize: 26, fontWeight: '700', color: COLORS.textPrimary, marginVertical: 8 },
+  statLabel: { fontSize: 12, lineHeight: 19, color: COLORS.textSecondary },
 });
-
-export default HomeScreen;

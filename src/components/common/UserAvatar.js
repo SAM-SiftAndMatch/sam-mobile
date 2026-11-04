@@ -1,15 +1,9 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import Text from '../../design/Text';
 import { COLORS } from '../../constants/colors';
-import { SIZES } from '../../constants/sizes';
 
-export const UserAvatar = ({
-  uri,
-  name = 'User',
-  size = 48,
-  showOnline = false,
-  style,
-}) => {
+export const UserAvatar = ({ uri, name = 'User', size = 48, showOnline = false, style }) => {
   const getInitials = (n) => {
     if (!n) return 'U';
     const parts = n.split(' ');
@@ -26,14 +20,9 @@ export const UserAvatar = ({
         />
       ) : (
         <View
-          style={[
-            styles.avatarFallback,
-            { width: size, height: size, borderRadius: size / 2 },
-          ]}
+          style={[styles.avatarFallback, { width: size, height: size, borderRadius: size / 2 }]}
         >
-          <Text style={[styles.initialsText, { fontSize: size * 0.38 }]}>
-            {getInitials(name)}
-          </Text>
+          <Text style={[styles.initialsText, { fontSize: size * 0.38 }]}>{getInitials(name)}</Text>
         </View>
       )}
 

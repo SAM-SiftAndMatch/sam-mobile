@@ -1,6 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
 
@@ -9,39 +10,20 @@ export const CategoryCard = ({ category, isSelected = false, onPress }) => {
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={onPress}
-      style={[
-        styles.card,
-        isSelected && styles.selectedCard,
-      ]}
+      style={[styles.card, isSelected && styles.selectedCard]}
     >
-      <View
-        style={[
-          styles.iconCircle,
-          isSelected && styles.selectedIconCircle,
-        ]}
-      >
+      <View style={[styles.iconCircle, isSelected && styles.selectedIconCircle]}>
         <Ionicons
           name={category.icon || 'briefcase-outline'}
           size={20}
           color={isSelected ? COLORS.white : COLORS.primary}
         />
       </View>
-      <Text
-        style={[
-          styles.categoryName,
-          isSelected && styles.selectedText,
-        ]}
-        numberOfLines={1}
-      >
+      <Text style={[styles.categoryName, isSelected && styles.selectedText]} numberOfLines={1}>
         {category.name}
       </Text>
       {category.jobsCount !== undefined && (
-        <Text
-          style={[
-            styles.jobsCountText,
-            isSelected && styles.selectedJobsCount,
-          ]}
-        >
+        <Text style={[styles.jobsCountText, isSelected && styles.selectedJobsCount]}>
           {category.jobsCount} jobs
         </Text>
       )}

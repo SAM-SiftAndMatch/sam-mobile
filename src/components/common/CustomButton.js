@@ -1,7 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { TouchableOpacity, StyleSheet, ActivityIndicator, View } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES, SHADOWS } from '../../constants/sizes';
 
@@ -67,28 +67,33 @@ export const CustomButton = ({
       onPress={onPress}
       disabled={disabled || loading}
       accessibilityRole="button"
+      accessibilityLabel={title}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[getContainerStyle(), style]}
     >
-      {variant === 'primary' && (
-        <LinearGradient
-          pointerEvents="none"
-          colors={[COLORS.primaryDark, COLORS.primary, COLORS.cyan]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[StyleSheet.absoluteFillObject, { borderRadius: size === 'large' ? SIZES.radiusLg : size === 'small' ? SIZES.radiusSm : SIZES.radius }]}
-        />
-      )}
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? COLORS.primary : COLORS.white} size="small" />
+        <ActivityIndicator
+          color={['outline', 'ghost'].includes(variant) ? COLORS.primary : COLORS.white}
+          size="small"
+        />
       ) : (
         <View style={styles.contentRow}>
           {icon && iconPosition === 'left' && (
-            <Ionicons name={icon} size={size === 'small' ? 16 : 20} color={getIconColor()} style={{ marginRight: 6 }} />
+            <Ionicons
+              name={icon}
+              size={size === 'small' ? 16 : 20}
+              color={getIconColor()}
+              style={{ marginRight: 6 }}
+            />
           )}
           <Text style={[getTextStyle(), textStyle]}>{title}</Text>
           {icon && iconPosition === 'right' && (
-            <Ionicons name={icon} size={size === 'small' ? 16 : 20} color={getIconColor()} style={{ marginLeft: 6 }} />
+            <Ionicons
+              name={icon}
+              size={size === 'small' ? 16 : 20}
+              color={getIconColor()}
+              style={{ marginLeft: 6 }}
+            />
           )}
         </View>
       )}
@@ -98,7 +103,8 @@ export const CustomButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: SIZES.radius,
+    borderRadius: SIZES.radiusSm,
+    minHeight: 48,
     paddingVertical: 12,
     paddingHorizontal: 20,
     alignItems: 'center',
@@ -106,6 +112,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   contentRow: {
+    flexShrink: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -137,7 +145,7 @@ const styles = StyleSheet.create({
   largeBtn: {
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: SIZES.radiusLg,
+    borderRadius: SIZES.radiusSm,
   },
   disabledBtn: {
     opacity: 0.5,

@@ -1,58 +1,32 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
-import { SIZES } from '../../constants/sizes';
-
-export const StatusBadge = ({ status = 'pending', label, style }) => {
-  const getBadgeStyle = () => {
-    switch (status.toLowerCase()) {
-      case 'open':
-      case 'accepted':
-      case 'active':
-      case 'in_progress':
-        return { bg: COLORS.successBg, text: COLORS.success, border: COLORS.secondaryLight };
-      case 'pending':
-      case 'draft':
-        return { bg: COLORS.warningBg, text: COLORS.warning, border: COLORS.accentLight };
-      case 'rejected':
-      case 'closed':
-        return { bg: COLORS.dangerBg, text: COLORS.danger, border: '#FCA5A5' };
-      default:
-        return { bg: COLORS.surface, text: COLORS.textSecondary, border: COLORS.border };
-    }
-  };
-
-  const badgeConfig = getBadgeStyle();
-  const labels = { open: 'Đang tuyển', in_progress: 'Đang thực hiện', pending: 'Chờ duyệt', accepted: 'Đã duyệt', rejected: 'Đã từ chối', draft: 'Bản nháp', completed: 'Hoàn thành', closed: 'Đã đóng', active: 'Đang hoạt động' };
-  const displayLabel = label || labels[status] || status;
-
+import { View, StyleSheet } from 'react-native';
+import Text from '../../design/Text';
+import { STATUS_APPEARANCE } from '../../constants/statuses';
+export function StatusBadge({ status = 'pending', label, style }) {
+  const [title, backgroundColor, color] = STATUS_APPEARANCE[String(status).toUpperCase()] || [
+    'Đang cập nhật',
+    '#F1F5F9',
+    '#475569',
+  ];
   return (
-    <View
-      style={[
-        styles.badge,
-        { backgroundColor: badgeConfig.bg, borderColor: badgeConfig.border },
-        style,
-      ]}
-    >
-      <Text style={[styles.text, { color: badgeConfig.text }]}>{displayLabel}</Text>
+    <View style={[styles.badge, { backgroundColor }, style]}>
+      <View style={[styles.dot, { backgroundColor: color }]} />
+      <Text style={[styles.text, { color }]}>{label || title}</Text>
     </View>
   );
-};
-
+}
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: SIZES.radiusFull,
-    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
     alignSelf: 'flex-start',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    flexShrink: 1,
   },
-  text: {
-    fontSize: SIZES.tiny,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+  dot: { width: 5, height: 5, borderRadius: 3 },
+  text: { fontSize: 11, fontWeight: '600', flexShrink: 1 },
 });
-
 export default StatusBadge;

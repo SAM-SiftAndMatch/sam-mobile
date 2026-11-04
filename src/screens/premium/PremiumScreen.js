@@ -1,39 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import Text from '../../design/Text';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
-import { useAuth } from '../../context/AuthContext';
-import { useApp } from '../../context/AppContext';
-import { getPremiumPlans } from '../../services/mockService';
-import Header from '../../components/common/Header';
-import PremiumCard from '../../components/premium/PremiumCard';
-import LoadingState from '../../components/common/LoadingState';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { useSubscriptions } from '../../features/subscriptions/SubscriptionsProvider';
+import { ErrorState } from '../../components/common/ErrorState';
+import { Header } from '../../components/common/Header';
+import { PremiumCard } from '../../components/premium/PremiumCard';
+import { LoadingState } from '../../components/common/LoadingState';
 
 export const PremiumScreen = ({ navigation }) => {
   const { user } = useAuth();
-  const { subscribeToPlan, loading } = useApp();
 
-  const [plans, setPlans] = useState([]);
-  const [fetching, setFetching] = useState(true);
-
-  useEffect(() => {
-    loadPlans();
-  }, []);
-
-  const loadPlans = async () => {
-    try {
-      const data = await getPremiumPlans();
-      setPlans(data);
-      setFetching(false);
-    } catch (e) {
-      setFetching(false);
-    }
-  };
+  const { plans, loading: fetching, error, refreshPlans } = useSubscriptions();
 
   const handleSelectPlan = (plan) => {
     if (plan.id === 'plan_free') {
-      Alert.alert('Free Plan', 'You are currently on the standard Free plan.');
+      Alert.alert('Gói cơ bản', 'Bạn đang sử dụng gói cơ bản.');
       return;
     }
     navigation.navigate('PremiumPlanDetail', { plan });
@@ -41,21 +26,22 @@ export const PremiumScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header title="WorkMarket Premium" showBack />
+      <Header title="SAM Premium" showBack />
 
+      {error && <ErrorState message={error} onRetry={() => void refreshPlans().catch(() => {})} />}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.heroSection}>
           <View style={styles.badgeCircle}>
             <Ionicons name="sparkles" size={32} color={COLORS.accent} />
           </View>
-          <Text style={styles.heroTitle}>Unlock Premium Features</Text>
+          <Text style={styles.heroTitle}>Nâng cấp trải nghiệm SAM</Text>
           <Text style={styles.heroSub}>
-            Supercharge your freelance career or hire top talent 5x faster with WorkMarket PRO & PREMIUM.
+            Khám phá các gói phù hợp với nhu cầu làm việc và tuyển dụng của bạn.
           </Text>
         </View>
 
         {fetching ? (
-          <LoadingState message="Loading subscription plans..." />
+          <LoadingState message="Đang tải các gói…" />
         ) : (
           plans.map((plan) => (
             <PremiumCard

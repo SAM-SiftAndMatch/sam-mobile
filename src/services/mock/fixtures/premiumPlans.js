@@ -1,0 +1,36 @@
+// Sample catalogue for the mobile design preview. Prices must come from the API in production.
+export const mockPremiumPlans = [
+  {
+    id: 'plan_free',
+    name: 'BASE',
+    price: 0,
+    currency: 'VND',
+    period: 'miễn phí',
+    description: 'Bắt đầu kết nối và quản lý dự án.',
+    popular: false,
+    badgeColor: '#64748B',
+    features: ['Tìm kiếm dự án', 'Gửi đề xuất và trao đổi', 'Theo dõi các dự án của bạn'],
+  },
+  {
+    id: 'plan_pro',
+    name: 'PRO DEV',
+    price: 149000,
+    currency: 'VND',
+    period: 'tháng',
+    description: 'Gói dành cho Freelancer.',
+    popular: true,
+    badgeColor: '#1D4ED8',
+    features: ['Tiếp cận dự án tuyển gấp', 'AI Job Matcher và Instant Claim', 'Smart Scope Shield'],
+  },
+  {
+    id: 'plan_premium',
+    name: 'BUSINESS',
+    price: 249000,
+    currency: 'VND',
+    period: 'tháng',
+    description: 'Gói dành cho khách hàng và doanh nghiệp.',
+    popular: false,
+    badgeColor: '#0369A1',
+    features: ['Đăng dự án nổi bật', 'Tuyển gấp với AI Headhunter', 'Quản lý dự án tập trung'],
+  },
+];
