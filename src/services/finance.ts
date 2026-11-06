@@ -1,4 +1,52 @@
 import { apiRequest, requestKey } from './api/client';
+export interface IncomeMonth {
+  month: number;
+  netIncome: number;
+  grossIncome: number;
+  platformFees: number;
+  completedCount: number;
+  sandboxNetIncome: number;
+}
+export interface FreelancerIncome {
+  currency: string;
+  timezone: string;
+  year: number;
+  totalNetIncome: number;
+  totalGrossIncome: number;
+  totalPlatformFees: number;
+  completedCount: number;
+  sandboxNetIncome: number;
+  yearNetIncome: number;
+  yearGrossIncome: number;
+  yearPlatformFees: number;
+  yearCompletedCount: number;
+  yearSandboxNetIncome: number;
+  months: IncomeMonth[];
+}
+export interface IncomeEntry {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  maintenanceOrderId?: string;
+  acceptedAt: string;
+  grossIncome: number;
+  platformFees: number;
+  netIncome: number;
+}
+export interface IncomeEntries {
+  items: IncomeEntry[];
+  page: number;
+  size: number;
+  totalElements: number;
+  year: number;
+}
+export interface BankSetupStatus {
+  status: 'READY' | 'PENDING' | 'ACTION_REQUIRED';
+  hasVerifiedAccount: boolean;
+  hasBankAccount: boolean;
+  needsBankAccount: boolean;
+  pendingCount: number;
+}
 export interface Bank {
   id: string;
   bankCode: string;
@@ -93,6 +141,11 @@ export const money = (n: number) =>
   }).format(n);
 export const dateTime = (value: string) => new Date(value).toLocaleString('vi-VN');
 export const finance = {
+  income: (year?: number) =>
+    apiRequest<FreelancerIncome>(`/finance/income${year === undefined ? '' : `?year=${year}`}`),
+  incomeEntries: (year: number, page = 0) =>
+    apiRequest<IncomeEntries>(`/finance/income/entries?year=${year}&page=${page}`),
+  bankSetup: () => apiRequest<BankSetupStatus>('/finance/bank-accounts/setup-status'),
   transactions: (page = 0) =>
     apiRequest<FinanceTransaction[]>(`/finance/transactions?page=${page}`),
   wallet: () => apiRequest<Wallet>('/finance/wallet'),

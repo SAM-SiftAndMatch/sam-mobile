@@ -11,6 +11,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import IncomeOverview, { BankSetupNotice } from './IncomeOverview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../features/auth/AuthProvider';
 import { useAsyncResource } from '../../hooks/useAsyncResource';
@@ -28,11 +30,24 @@ import {
 import Text from '../../design/Text';
 import { Header } from '../../components/common/Header';
 import { COLORS } from '../../constants/colors';
-export default function FinanceScreen() {
+export default function FinanceRoute() {
+  const params = useLocalSearchParams<{ tab?: string; action?: string }>();
   const { user } = useAuth();
-  const [tab, setTab] = useState('overview');
+  return (
+    <FinanceScreen
+      key={`${user?.id}:${params.tab}:${params.action}`}
+      initialTab={params.tab === 'banks' ? 'banks' : 'income'}
+      addBank={params.action === 'add-bank'}
+    />
+  );
+}
+function FinanceScreen({ initialTab, addBank }: { initialTab: string; addBank: boolean }) {
+  const { user } = useAuth();
+  const [tab, setTab] = useState(initialTab);
+  const [editingBank, setEditingBank] = useState<string | null>(null);
+  const [bankVersion, setBankVersion] = useState(0);
   const [page, setPage] = useState(0);
-  const [mode, setMode] = useState<'bank' | 'withdraw' | 'disable' | null>(null);
+  const [mode, setMode] = useState<'bank' | 'withdraw' | 'disable' | null>(addBank ? 'bank' : null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -75,6 +90,7 @@ export default function FinanceScreen() {
   const wallet = data.wallet;
   const close = () => {
     setMode(null);
+    setEditingBank(null);
     setPassword('');
     setAccount('');
     setHolder('');
@@ -91,12 +107,16 @@ export default function FinanceScreen() {
     setError('');
     try {
       if (mode === 'bank')
-        await apiRequest('/finance/bank-accounts', 'POST', {
-          bankCode,
-          accountNumber: account,
-          accountHolder: holder,
-          password,
-        });
+        await apiRequest(
+          editingBank ? `/finance/bank-accounts/${editingBank}` : '/finance/bank-accounts',
+          editingBank ? 'PUT' : 'POST',
+          {
+            bankCode,
+            accountNumber: account,
+            accountHolder: holder,
+            password,
+          },
+        );
       else if (mode === 'disable')
         await apiRequest(`/finance/bank-accounts/${bankId}/disable`, 'POST', { password });
       else {
@@ -110,12 +130,13 @@ export default function FinanceScreen() {
       }
       setNotice(
         mode === 'bank'
-          ? 'Đã thêm tài khoản, đang chờ xác minh.'
+          ? 'Đã lưu tài khoản. Thông tin thay đổi cần được xác minh trước khi rút tiền.'
           : mode === 'disable'
             ? 'Đã ngừng sử dụng tài khoản.'
             : 'Đã tạo yêu cầu rút. Tiền chưa chuyển ngân hàng và đang chờ duyệt.',
       );
       close();
+      setBankVersion((v) => v + 1);
       await refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Không thực hiện được thao tác.');
@@ -127,14 +148,15 @@ export default function FinanceScreen() {
   };
   return (
     <SafeAreaView style={styles.page} edges={['top', 'bottom']}>
-      <Header title="Thu nhập & công nợ" showBack />
+      <Header title="Thu nhập & thanh toán" showBack />
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={() => void refresh().catch(() => {})} />
         }
       >
-        <Text style={styles.title}>Tiền của bạn, rõ từng dự án</Text>
+        <Text style={styles.title}>Thu nhập & thanh toán</Text>
+        {apiMode && user?.role === 'freelancer' && <BankSetupNotice key={bankVersion} />}
         <Text style={styles.note}>
           Công nợ chỉ được rút sau 7 ngày bảo trì và khi ticket liên quan đã được giải quyết. Hoàn
           cọc được theo dõi riêng.
@@ -148,29 +170,33 @@ export default function FinanceScreen() {
           </Text>
         )}
         {notice && <Text style={styles.note}>{notice}</Text>}
-        <View style={styles.stats}>
-          {[
-            ['Khả dụng', wallet?.availableBalance],
-            ['Chờ bảo trì', wallet?.pendingBalance],
-            ['Giữ do ticket', wallet?.heldBalance],
-            ['Đang chờ chi', wallet?.reservedBalance],
-          ].map(([label, value]) => (
-            <View key={String(label)} style={styles.stat}>
-              <Text style={styles.muted}>{String(label)}</Text>
-              <Text style={styles.value}>{money(Number(value || 0))}</Text>
+        {tab !== 'income' && (
+          <>
+            <View style={styles.stats}>
+              {[
+                ['Khả dụng', wallet?.availableBalance],
+                ['Chờ bảo trì', wallet?.pendingBalance],
+                ['Giữ do ticket', wallet?.heldBalance],
+                ['Đang chờ chi', wallet?.reservedBalance],
+              ].map(([label, value]) => (
+                <View key={String(label)} style={styles.stat}>
+                  <Text style={styles.muted}>{String(label)}</Text>
+                  <Text style={styles.value}>{money(Number(value || 0))}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-        {wallet && (
-          <Text style={styles.muted}>
-            Escrow chưa nghiệm thu: {money(wallet.escrowGross)} · Cọc đang giữ:{' '}
-            {money(wallet.lockedDeposit)} · Đã chi: {money(wallet.paidTotal)}
-          </Text>
-        )}
-        {wallet && wallet.sandboxBalance > 0 && (
-          <Text style={styles.muted}>
-            Mô phỏng: {money(wallet.sandboxBalance)}. Không rút được thành tiền thật.
-          </Text>
+            {wallet && (
+              <Text style={styles.muted}>
+                Escrow chưa nghiệm thu: {money(wallet.escrowGross)} · Cọc đang giữ:{' '}
+                {money(wallet.lockedDeposit)} · Đã chi: {money(wallet.paidTotal)}
+              </Text>
+            )}
+            {wallet && wallet.sandboxBalance > 0 && (
+              <Text style={styles.muted}>
+                Mô phỏng: {money(wallet.sandboxBalance)}. Không rút được thành tiền thật.
+              </Text>
+            )}
+          </>
         )}
         <View style={styles.row}>
           {
@@ -178,6 +204,10 @@ export default function FinanceScreen() {
               label={'Thêm ngân hàng'}
               onPress={() => {
                 key.current = null;
+                setEditingBank(null);
+                setAccount('');
+                setHolder('');
+                setPassword('');
                 setMode('bank');
                 setError('');
               }}
@@ -202,7 +232,8 @@ export default function FinanceScreen() {
         </View>
         <View style={styles.row}>
           {[
-            ['overview', 'Dự án'],
+            ['income', 'Thu nhập'],
+            ['overview', 'Số dư'],
             ['banks', 'Ngân hàng'],
             ['withdrawals', 'Lịch sử rút'],
             ['transactions', 'Giao dịch'],
@@ -221,6 +252,7 @@ export default function FinanceScreen() {
             </TouchableOpacity>
           ))}
         </View>
+        {tab === 'income' && apiMode && user?.role === 'freelancer' && <IncomeOverview />}
         {tab === 'overview' &&
           (wallet?.payables.length ? (
             wallet.payables.map((p) => (
@@ -251,6 +283,20 @@ export default function FinanceScreen() {
                 </Text>
                 <Text style={styles.body}>{statusLabel[b.status]}</Text>
                 {b.verificationNote && <Text style={styles.muted}>{b.verificationNote}</Text>}
+                {b.status !== 'DISABLED' && (
+                  <ActionButton
+                    label="Cập nhật tài khoản"
+                    onPress={() => {
+                      setEditingBank(b.id);
+                      setBankCode(b.bankCode);
+                      setAccount('');
+                      setHolder('');
+                      setPassword('');
+                      setError('');
+                      setMode('bank');
+                    }}
+                  />
+                )}
                 {b.status !== 'DISABLED' && (
                   <ActionButton
                     label={'Ngừng sử dụng'}
@@ -360,13 +406,21 @@ export default function FinanceScreen() {
             <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
               <Text style={styles.title}>
                 {mode === 'bank'
-                  ? 'Thêm tài khoản nhận tiền'
+                  ? editingBank
+                    ? 'Cập nhật tài khoản nhận tiền'
+                    : 'Thêm tài khoản nhận tiền'
                   : mode === 'disable'
                     ? 'Ngừng sử dụng tài khoản'
                     : 'Yêu cầu rút tiền'}
               </Text>
               {mode === 'bank' ? (
                 <>
+                  {editingBank && (
+                    <Text style={styles.note}>
+                      Nhập lại đầy đủ thông tin. Thay đổi tạo phiên bản mới để xác minh; nếu đang có
+                      lệnh chi chưa kết thúc, hãy thêm tài khoản mới.
+                    </Text>
+                  )}
                   <Text style={styles.label}>Mã ngân hàng</Text>
                   <TextInput
                     accessibilityLabel="Mã ngân hàng"
