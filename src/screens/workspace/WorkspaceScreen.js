@@ -50,6 +50,23 @@ export default function WorkspaceScreen({ route, navigation }) {
           </TouchableOpacity>
           <Text style={[styles.cardTitle, { marginBottom: 0, flex: 1 }]}>Không gian dự án</Text>
         </View>
+        {room.project.status === 'completed' && (
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('Maintenance', { jobId: room.project.id })}
+            style={{
+              marginHorizontal: 16,
+              marginBottom: 10,
+              padding: 12,
+              borderRadius: 12,
+              backgroundColor: '#EFF6FF',
+            }}
+          >
+            <Text style={{ color: COLORS.primary, fontWeight: '600' }}>
+              Bảo trì & ticket sau nghiệm thu
+            </Text>
+          </TouchableOpacity>
+        )}
         <View style={styles.tabs}>
           {['Tin nhắn', 'Tiến độ', 'Thỏa thuận'].map((label) => (
             <TouchableOpacity

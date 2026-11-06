@@ -16,6 +16,8 @@ export const ROUTES = {
   Splash: '/welcome',
   Messages: '/messages',
   Workspace: '/workspace',
+  Finance: '/finance',
+  Maintenance: '/maintenance',
 } as const;
 export type ScreenName = keyof typeof ROUTES;
 export function singleParam(value: string | string[] | undefined) {

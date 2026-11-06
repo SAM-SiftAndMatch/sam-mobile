@@ -13,6 +13,12 @@ import type { Registration, User } from '../../types/domain';
 import { useRequestGate } from '../../hooks/useRequestGate';
 import { errorMessage } from '../../lib/errors';
 import { createSessionStorage } from '../../lib/session';
+import {
+  apiMode,
+  restoreApiSession,
+  apiLogout,
+  onApiSessionExpired,
+} from '../../services/api/client';
 
 const sessions = createSessionStorage(AsyncStorage);
 interface AuthState {
@@ -38,11 +44,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const ticket = gate.begin('restore');
-    void sessions
-      .read()
+    const restoration = apiMode
+      ? sessions.read().then((stored) => (stored ? restoreApiSession(stored.id) : null))
+      : sessions.read();
+    void restoration
       .then(async (stored) => {
         if (!gate.isCurrent(ticket)) return;
-        if (stored) await sessions.write(stored); // migrate old credential-bearing mock sessions
+        if (stored || apiMode) await sessions.write(stored); // migrate old credential-bearing mock sessions
         if (gate.isCurrent(ticket)) setUser(stored);
       })
       .catch(async (cause) => {
@@ -54,6 +62,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
         if (gate.isCurrent(ticket)) setInitializing(false);
       });
   }, [gate]);
+
+  useEffect(
+    () =>
+      onApiSessionExpired(() => {
+        gate.activate();
+        setUser(null);
+        setInitializing(false);
+        setSessionId((value) => value + 1);
+        setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        void sessions.write(null).catch(() => {});
+      }),
+    [gate],
+  );
 
   const authenticate = useCallback(
     async (request: () => Promise<User>) => {
@@ -93,6 +114,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setLoading(false);
     setError(null);
     await sessions.write(null);
+    if (apiMode) await apiLogout().catch(() => {});
   }, [gate]);
   const updateProfile = useCallback(
     async (data: Partial<User>) => {

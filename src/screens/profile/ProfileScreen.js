@@ -15,6 +15,16 @@ export const ProfileScreen = ({ navigation }) => {
   const isFreelancer = role === 'freelancer';
 
   const menuItems = [
+    ...(isFreelancer
+      ? [
+          {
+            id: 'finance',
+            title: 'Thu nhập & công nợ',
+            icon: 'wallet-outline',
+            onPress: () => navigation.navigate('Finance'),
+          },
+        ]
+      : []),
     {
       id: 'm1',
       title: isFreelancer ? 'Đề xuất của tôi' : 'Dự án của tôi',
