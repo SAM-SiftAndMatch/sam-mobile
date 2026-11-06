@@ -1,3 +1,4 @@
+import { ProjectAddonPayment } from '../finance/ProjectPaymentSections';
 import { useChat } from '../../features/chat/useChat';
 import { useMarketplace } from '../../features/marketplace/MarketplaceProvider';
 import React from 'react';
@@ -52,6 +53,7 @@ export const JobDetailScreen = ({ route, navigation }) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {isOwner && job.status === 'open' && <ProjectAddonPayment jobId={job.id} />}
         {/* Main Job Overview Card */}
         <View style={styles.card}>
           <View style={styles.categoryRow}>

@@ -1,4 +1,7 @@
-import { useRef, useState } from 'react';
+import { apiMode, apiRequest } from '../../services/api/client';
+import { useAuth } from '../auth/AuthProvider';
+import { useAsyncResource } from '../../hooks/useAsyncResource';
+import { useCallback, useRef, useState } from 'react';
 import type { ScrollView } from 'react-native';
 import type { Job } from '../../types/domain';
 import { errorMessage } from '../../lib/errors';
@@ -6,7 +9,7 @@ import { useRequestGate } from '../../hooks/useRequestGate';
 import { useMarketplace } from './MarketplaceProvider';
 import {
   initialProjectForm,
-  upgradeTotal,
+  PROJECT_UPGRADES,
   validateProjectStep,
   buildProjectPayload,
 } from './model/projectForm';
@@ -14,6 +17,20 @@ import {
 type ProjectForm = ReturnType<typeof initialProjectForm>;
 export function useProjectForm() {
   const { postJob, categories } = useMarketplace();
+  const { user } = useAuth();
+  const loadPrices = useCallback(
+    () =>
+      apiMode && user?.role === 'customer'
+        ? apiRequest<{ featuredFee: number; urgentFee: number }>('/jobs/addon-prices')
+        : Promise.resolve(null),
+    [user?.role],
+  );
+  const { data: prices } = useAsyncResource(loadPrices, null);
+  const upgradeOptions = PROJECT_UPGRADES.filter(() => !apiMode || Boolean(prices)).map((o) => ({
+    ...o,
+    price:
+      apiMode && prices ? (o.id === 'featured' ? prices.featuredFee : prices.urgentFee) : o.price,
+  }));
   const gate = useRequestGate();
   const [form, setForm] = useState(initialProjectForm);
   const [step, setStep] = useState(0);
@@ -111,7 +128,10 @@ export function useProjectForm() {
     setAssisted,
     scroll,
     categories,
-    fees: upgradeTotal(form.upgrades),
+    fees: upgradeOptions
+      .filter((o) => form.upgrades.includes(o.id))
+      .reduce((sum, o) => sum + o.price, 0),
+    upgradeOptions,
     goTo,
     next,
     makeBrief,

@@ -29,7 +29,7 @@ export const PROJECT_UPGRADES = [
     name: 'Nổi bật',
     icon: 'star-outline',
     price: 59000,
-    description: 'Ưu tiên hiển thị dự án trong 7 ngày.',
+    description: 'Ưu tiên hiển thị khi dự án còn tuyển.',
   },
   {
     id: 'urgent',
@@ -37,13 +37,6 @@ export const PROJECT_UPGRADES = [
     icon: 'flash-outline',
     price: 99000,
     description: 'Đánh dấu dự án cần nhận đề xuất sớm.',
-  },
-  {
-    id: 'guarantee',
-    name: 'Gói bảo hành',
-    icon: 'shield-checkmark-outline',
-    price: 59000,
-    description: 'Thêm yêu cầu hỗ trợ sau bàn giao.',
   },
 ];
 export const PROJECT_DURATIONS = [
@@ -117,7 +110,7 @@ export const buildProjectPayload = (
       (item) => item.id,
     ),
     upgradeFee: upgradeTotal(form.upgrades),
-    totalBudget: Number(form.budget) + upgradeTotal(form.upgrades),
+    totalBudget: Number(form.budget),
     status,
   };
 };

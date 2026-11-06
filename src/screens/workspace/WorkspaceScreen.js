@@ -1,3 +1,4 @@
+import { ContractFunding } from '../finance/ProjectPaymentSections';
 import { useChat } from '../../features/chat/useChat';
 import React, { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -121,6 +122,7 @@ export default function WorkspaceScreen({ route, navigation }) {
           <Text style={styles.label}>Hạn dự án</Text>
           <Text style={styles.body}>{formatDate(room.project.deadline)}</Text>
         </View>
+        {tab === 'Thỏa thuận' && <ContractFunding roomId={room.id} />}
         {tab === 'Tiến độ' ? (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Timeline và bàn giao</Text>

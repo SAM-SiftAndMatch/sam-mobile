@@ -34,7 +34,7 @@ test('review totals and deadline stay consistent with the submitted project', as
   assert.equal(upgradeTotal([]), 0);
   assert.equal(upgradeTotal(form.upgrades), 158000);
   const payload = buildProjectPayload(form, 'open', new Date(2026, 8, 28));
-  assert.equal(payload.totalBudget, 1158000);
+  assert.equal(payload.totalBudget, 1000000);
   assert.equal(payload.budget, 1000000);
   assert.equal(payload.currency, 'VND');
   assert.equal(payload.deadline, '2026-10-19');
@@ -49,7 +49,7 @@ test('service retains upgrades and currency; drafts reject proposals and publish
     ...initialProjectForm(),
     title: 'Dự án kiểm thử',
     description: 'Thiết kế giao diện ứng dụng tài chính',
-    upgrades: ['guarantee'],
+    upgrades: ['featured'],
   };
   const draft = await service.createJob({
     ...buildProjectPayload(form, 'draft'),
@@ -58,8 +58,8 @@ test('service retains upgrades and currency; drafts reject proposals and publish
   const stored = await service.getJobById(draft.id);
   assert.equal(stored.currency, 'VND');
   assert.equal(stored.upgradeFee, 59000);
-  assert.equal(stored.totalBudget, 1059000);
-  assert.deepEqual(stored.upgrades, ['guarantee']);
+  assert.equal(stored.totalBudget, 1000000);
+  assert.deepEqual(stored.upgrades, ['featured']);
   await assert.rejects(
     service.createApplication({ jobId: draft.id, freelancerId: 'test-freelancer' }),
     /không nhận ứng tuyển/,

@@ -1,3 +1,4 @@
+import { ProjectAddonPayment } from '../finance/ProjectPaymentSections';
 import { useProjectForm } from '../../features/marketplace/useProjectForm';
 import React from 'react';
 import {
@@ -18,7 +19,7 @@ import { Header } from '../../components/common/Header';
 import { CustomInput } from '../../components/common/CustomInput';
 import { CustomButton } from '../../components/common/CustomButton';
 import { formatCurrency } from '../../utils/formatCurrency';
-import { PROJECT_UPGRADES, PROJECT_DURATIONS } from '../../features/marketplace/model/projectForm';
+import { PROJECT_DURATIONS } from '../../features/marketplace/model/projectForm';
 
 const STEPS = ['Thông tin', 'Ngân sách', 'Nâng cấp', 'Xem lại'];
 const TITLES = [
@@ -77,6 +78,7 @@ export const CreatePostScreen = ({ navigation }) => {
     scroll,
     categories,
     fees,
+    upgradeOptions,
     goTo,
     next,
     makeBrief,
@@ -116,6 +118,7 @@ export const CreatePostScreen = ({ navigation }) => {
               {result.status === 'draft' ? 'Đã lưu bản nháp' : 'Dự án đã được đăng!'}
             </Text>
             <Text style={styles.body}>{result.title}</Text>
+            <ProjectAddonPayment jobId={result.id} />
             <Text style={styles.subtitle}>
               {result.status === 'draft'
                 ? 'Bản nháp chưa hiển thị cho freelancer.'
@@ -255,7 +258,7 @@ export const CreatePostScreen = ({ navigation }) => {
             )}
             {step === 2 && (
               <>
-                {PROJECT_UPGRADES.map((option) => {
+                {upgradeOptions.map((option) => {
                   const selected = form.upgrades.includes(option.id);
                   return (
                     <TouchableOpacity
@@ -316,14 +319,14 @@ export const CreatePostScreen = ({ navigation }) => {
                 </ReviewCard>
                 <ReviewCard title="Nâng cấp đã chọn" onEdit={() => goTo(2)}>
                   {form.upgrades.length ? (
-                    PROJECT_UPGRADES.filter((item) => form.upgrades.includes(item.id)).map(
-                      (item) => (
+                    upgradeOptions
+                      .filter((item) => form.upgrades.includes(item.id))
+                      .map((item) => (
                         <View key={item.id} style={styles.row}>
                           <Text style={styles.body}>{item.name}</Text>
                           <Text style={styles.price}>{money(item.price)}</Text>
                         </View>
-                      ),
-                    )
+                      ))
                   ) : (
                     <Text style={styles.body}>Không sử dụng nâng cấp.</Text>
                   )}
@@ -335,7 +338,7 @@ export const CreatePostScreen = ({ navigation }) => {
                 <Text style={styles.label}>TỔNG NGÂN SÁCH DỰ KIẾN</Text>
                 <Text style={styles.amount}>{money(Number(form.budget) + fees)}</Text>
                 <Text style={styles.hint}>
-                  Ngân sách dự án + {money(fees)} phí nâng cấp dự kiến.
+                  Ngân sách trả freelancer và phí tính năng {money(fees)} được thanh toán riêng.
                 </Text>
               </LinearGradient>
             )}

@@ -1,5 +1,6 @@
+import { openPayment } from '../../services/payments';
 import React, { useCallback, useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Linking } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../features/auth/AuthProvider';
 import { useAsyncResource } from '../../hooks/useAsyncResource';
@@ -162,24 +163,11 @@ export function PaidOrdersSection({ scopeId }: { scopeId: string }) {
     setBusy(true);
     setError('');
     try {
-      const payment = await apiRequest<{ checkoutUrl?: string; vnpayUrl?: string }>(
+      const payment = await apiRequest<{ checkoutUrl?: string; orderId?: string }>(
         `/paid-maintenance-orders/${order}/checkout`,
         'POST',
       );
-      const target = payment.checkoutUrl || payment.vnpayUrl;
-      if (!target) throw new Error('Chưa tạo được thanh toán.');
-      const parsed = new URL(target);
-      if (
-        parsed.protocol !== 'https:' ||
-        ![
-          'payment.pay2s.vn',
-          'sandbox-payment.pay2s.vn',
-          'pay.vnpay.vn',
-          'sandbox.vnpayment.vn',
-        ].includes(parsed.hostname)
-      )
-        throw new Error('Liên kết thanh toán không hợp lệ.');
-      await Linking.openURL(target);
+      await openPayment(payment);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Không mở được thanh toán.');
     } finally {

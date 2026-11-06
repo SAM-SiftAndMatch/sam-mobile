@@ -1,5 +1,5 @@
 import type { Repository } from '../contracts';
-import type { Category, Conversation, Job, Proposal, PremiumPlan, User } from '../../types/domain';
+import type { Category, Conversation, Job, Proposal, User } from '../../types/domain';
 import { apiLogin, apiRegister, apiRequest, apiUser } from './client';
 interface Page<T> {
   items: T[];
@@ -17,6 +17,8 @@ interface ApiJob {
   createdAt: string;
   deadline: string;
   skills?: { name: string }[];
+  isFeatured?: boolean;
+  isUrgentHiring?: boolean;
 }
 interface ApiProposal {
   id: string;
@@ -62,6 +64,7 @@ const job = (j: ApiJob): Job => ({
   createdAt: j.createdAt,
   deadline: j.deadline,
   applicationsCount: 0,
+  upgrades: [...(j.isFeatured ? ['featured'] : []), ...(j.isUrgentHiring ? ['urgent'] : [])],
 });
 const proposal = (p: ApiProposal): Proposal => ({
   id: p.id,
@@ -132,6 +135,8 @@ export const apiRepository: Repository = {
           budgetMax: data.budget,
           estimatedDurationMonths: 1,
           deadline: data.deadline || null,
+          isFeatured: data.upgrades?.includes('featured') || false,
+          isUrgentHiring: data.upgrades?.includes('urgent') || false,
         }),
       ),
     deleteJob: async () => {
@@ -216,9 +221,31 @@ export const apiRepository: Repository = {
     markRead: (id) => apiRequest(`/notifications/${id}/read`, 'POST'),
   },
   subscriptions: {
-    listPlans: async () => [] as PremiumPlan[],
-    subscribe: async () => {
-      throw new Error('Vui lòng quản lý gói dịch vụ trên website SAM.');
+    listPlans: async () =>
+      (
+        await apiRequest<{ id: string; name: string; price: number; description: string }[]>(
+          '/packages',
+        )
+      ).map((p) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        currency: 'VND',
+        period: '30 ngày',
+        description: p.description || '',
+        features: [p.description || 'Quyền lợi theo gói dịch vụ'],
+        popular: false,
+        badgeColor: '#1D4ED8',
+      })),
+    subscribe: async (_user, planId) => {
+      const plans = await apiRepository.subscriptions.listPlans();
+      const plan = plans.find((p) => p.id === planId);
+      if (!plan) throw new Error('Gói không còn được cung cấp.');
+      const response = await apiRequest<{
+        entitled: boolean;
+        checkout?: import('../payments').Checkout;
+      }>('/subscriptions/purchase', 'POST', { packageId: planId });
+      return { success: response.entitled, plan, checkout: response.checkout };
     },
   },
 };

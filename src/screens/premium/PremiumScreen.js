@@ -1,20 +1,19 @@
+import { router } from 'expo-router';
 import React from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import Text from '../../design/Text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
 import { SIZES } from '../../constants/sizes';
-import { useAuth } from '../../features/auth/AuthProvider';
 import { useSubscriptions } from '../../features/subscriptions/SubscriptionsProvider';
 import { ErrorState } from '../../components/common/ErrorState';
+import { CustomButton } from '../../components/common/CustomButton';
 import { Header } from '../../components/common/Header';
 import { PremiumCard } from '../../components/premium/PremiumCard';
 import { LoadingState } from '../../components/common/LoadingState';
 
 export const PremiumScreen = ({ navigation }) => {
-  const { user } = useAuth();
-
-  const { plans, loading: fetching, error, refreshPlans } = useSubscriptions();
+  const { plans, loading: fetching, error, refreshPlans, currentPlanName } = useSubscriptions();
 
   const handleSelectPlan = (plan) => {
     if (plan.id === 'plan_free') {
@@ -27,6 +26,7 @@ export const PremiumScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Header title="SAM Premium" showBack />
+      <CustomButton title="Lịch sử thanh toán" onPress={() => router.push('/payments')} />
 
       {error && <ErrorState message={error} onRetry={() => void refreshPlans().catch(() => {})} />}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -47,7 +47,7 @@ export const PremiumScreen = ({ navigation }) => {
             <PremiumCard
               key={plan.id}
               plan={plan}
-              isCurrentPlan={user?.premiumPlan === plan.name}
+              isCurrentPlan={currentPlanName === plan.name}
               onSelect={() => handleSelectPlan(plan)}
             />
           ))
