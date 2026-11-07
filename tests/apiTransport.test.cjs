@@ -20,6 +20,14 @@ function auth(id, token = `access-${id}`) {
 }
 function load(fetch, base = 'https://api.example.test') {
   const exports = {};
+  const storage = new Map();
+  const paymentExports = {};
+  vm.runInNewContext(
+    ts.transpileModule(fs.readFileSync('src/services/payment-idempotency.ts', 'utf8'), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    }).outputText,
+    { exports: paymentExports, module: { exports: paymentExports } },
+  );
   const code = ts.transpileModule(fs.readFileSync('src/services/api/client.ts', 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
@@ -28,6 +36,16 @@ function load(fetch, base = 'https://api.example.test') {
     module: { exports },
     require: (name) => {
       if (name === 'react-native') return { Platform: { OS: 'ios' } };
+      if (name === '../payment-idempotency') return paymentExports;
+      if (name === '@react-native-async-storage/async-storage')
+        return {
+          __esModule: true,
+          default: {
+            getItem: async (k) => storage.get(k) || null,
+            setItem: async (k, v) => storage.set(k, v),
+            removeItem: async (k) => storage.delete(k),
+          },
+        };
       throw new Error(name);
     },
     fetch,
@@ -116,4 +134,31 @@ test('valid refresh rotation retries once with the same identity and new token',
   const wallet = await api.apiRequest('/finance/wallet');
   assert.equal(wallet.availableBalance, 0);
   assert.deepEqual(sent, ['Bearer access-a', 'Bearer rotated-a']);
+});
+
+test('checkout retries preserve the same key through refresh and repeated taps', async () => {
+  const keys = [];
+  let count = 0;
+  let issued = 0;
+  const api = load(async (url, options) => {
+    if (url.endsWith('/auth/login')) return response(200, auth('a'));
+    if (url.endsWith('/auth/refresh')) return response(200, auth('a', 'rotated'));
+    if (url.endsWith('/finance/request-key')) {
+      issued++;
+      return response(200, '01234567-89ab-cdef-0123-456789abcdef');
+    }
+    keys.push(options.headers['Idempotency-Key']);
+    return ++count === 1
+      ? response(401, null, 1004)
+      : response(200, { orderId: 'order-a', paymentStatus: 'CREATING' });
+  });
+  await api.apiLogin('a', 'password');
+  await api.apiRequest('/payments/fund', 'POST', { contractId: 'contract-a' });
+  await api.apiRequest('/payments/fund', 'POST', {
+    contractId: 'contract-a',
+    returnUrl: 'https://another-safe-return.example',
+  });
+  assert.equal(issued, 1);
+  assert.equal(keys.length, 3);
+  assert.ok(keys.every((k) => k === keys[0]));
 });

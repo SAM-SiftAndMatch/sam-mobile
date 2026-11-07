@@ -12,6 +12,8 @@ export interface Checkout {
   fulfillmentStatus: string;
   checkoutUrl?: string | null;
   transferContent: string;
+  supportCode?: string;
+  reviewRequired?: boolean;
   createdAt?: string;
   paidAt?: string | null;
 }

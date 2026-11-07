@@ -1,4 +1,6 @@
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { paymentScope } from '../payment-idempotency';
 import type { User } from '../../types/domain';
 export const apiMode = Boolean(process.env.EXPO_PUBLIC_API_URL);
 const base = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/$/, '') + '/api/v1';
@@ -56,6 +58,7 @@ async function send<T>(
   body?: unknown,
   auth = true,
   access = token,
+  extraHeaders: Record<string, string> = {},
 ): Promise<{ status: number; value: Envelope<T> }> {
   if (!apiMode) throw new Error('Chức năng chưa khả dụng trong phiên hiện tại.');
   if (!__DEV__ && !base.startsWith('https://'))
@@ -65,7 +68,7 @@ async function send<T>(
   try {
     const response = await fetch(base + path, {
       method,
-      headers: headers(auth, access),
+      headers: { ...headers(auth, access), ...extraHeaders },
       credentials: 'include',
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: controller.signal,
@@ -118,17 +121,62 @@ export async function restoreApiSession(expectedUserId = current?.id): Promise<U
 }
 export async function apiRequest<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   const epoch = generation;
-  let response = await send<T>(path, method, body);
+  const scope = paymentScope(path, method, body);
+  const extra: Record<string, string> = {};
+  if (scope && current?.id) {
+    const owner = current.id;
+    const storageKey = `sam:payment-key:${owner}:${scope}`;
+    let key = await AsyncStorage.getItem(storageKey);
+    if (!key) {
+      // The existing server endpoint generates a cryptographic UUID; no mobile RNG dependency.
+      key = await apiRequest<string>('/finance/request-key');
+      await AsyncStorage.setItem(storageKey, key);
+    }
+    if (epoch !== generation) throw new Error('Phiên đăng nhập đã thay đổi.');
+    extra['Idempotency-Key'] = key;
+  }
+  let response = await send<T>(path, method, body, true, token, extra);
   if (epoch !== generation) throw new Error('Phiên đăng nhập đã thay đổi.');
   if (response.status === 401 && current && !path.startsWith('/auth/')) {
     const restored = await restoreApiSession();
     if (epoch !== generation) throw new Error('Phiên đăng nhập đã thay đổi.');
-    if (restored) response = await send<T>(path, method, body);
+    if (restored) response = await send<T>(path, method, body, true, token, extra);
   }
   if (epoch !== generation) throw new Error('Phiên đăng nhập đã thay đổi.');
   if (response.status < 200 || response.status >= 300 || response.value.code !== 1000)
     throw new Error(response.value.message || 'Không thực hiện được yêu cầu. Vui lòng thử lại.');
-  return response.value.result;
+  const result = response.value.result;
+  const resultOwner = current?.id;
+  if (resultOwner && result && typeof result === 'object') {
+    const value = result as {
+      checkout?: { orderId?: string; paymentStatus?: string };
+      orderId?: string;
+      paymentStatus?: string;
+    };
+    const order = value.checkout || value;
+    if (order.orderId) {
+      const name = `sam:payment-order:${resultOwner}:${order.orderId}`;
+      if (scope && extra['Idempotency-Key'])
+        await AsyncStorage.setItem(name, JSON.stringify({ scope, key: extra['Idempotency-Key'] }));
+      if (order.paymentStatus && ['PAID', 'CANCELLED', 'EXPIRED'].includes(order.paymentStatus)) {
+        let saved: { scope?: string; key?: string } | null = null;
+        try {
+          saved = JSON.parse((await AsyncStorage.getItem(name)) || 'null');
+        } catch {
+          /* Ignore invalid navigation metadata. */
+        }
+        if (
+          saved &&
+          (await AsyncStorage.getItem(`sam:payment-key:${resultOwner}:${saved.scope}`)) ===
+            saved.key
+        )
+          await AsyncStorage.removeItem(`sam:payment-key:${resultOwner}:${saved.scope}`);
+        await AsyncStorage.removeItem(name);
+      }
+    }
+  }
+  if (epoch !== generation) throw new Error('Phiên đăng nhập đã thay đổi.');
+  return result;
 }
 export async function apiLogin(email: string, password: string): Promise<User> {
   generation++;

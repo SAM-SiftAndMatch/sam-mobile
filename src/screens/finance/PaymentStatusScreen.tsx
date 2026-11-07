@@ -10,7 +10,7 @@ import { Header } from '../../components/common/Header';
 import { useAuth } from '../../features/auth/AuthProvider';
 import { useAsyncResource } from '../../hooks/useAsyncResource';
 import { apiMode } from '../../services/api/client';
-import { normalizeCheckoutId, paymentLabel, payments } from '../../services/payments';
+import { normalizeCheckoutId, paymentLabel, payments, openPayment } from '../../services/payments';
 export default function PaymentStatusScreen() {
   const params = useLocalSearchParams<{ orderId?: string }>();
   const { user } = useAuth();
@@ -97,7 +97,24 @@ export default function PaymentStatusScreen() {
               {new Intl.NumberFormat('vi-VN').format(data.amount)} đ ·{' '}
               {data.environment === 'SANDBOX' ? 'Thử nghiệm' : 'Thực tế'}
             </Text>
-            <Text>{data.transferContent}</Text>
+            <Text>Mã hỗ trợ: {data.supportCode || data.orderId}</Text>
+            {data.paymentStatus === 'PENDING' && (
+              <Text>Nội dung chuyển khoản: {data.transferContent}</Text>
+            )}
+            {data.reviewRequired && (
+              <Text>
+                SAM đang đối soát. Nếu đã chuyển tiền, không cần thanh toán lại. Cung cấp mã hỗ trợ
+                khi liên hệ.
+              </Text>
+            )}
+            {data.paymentStatus === 'PENDING' && data.checkoutUrl && (
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => void openPayment(data).catch(() => {})}
+              >
+                <Text style={{ color: '#1D4ED8' }}>Tiếp tục thanh toán</Text>
+              </TouchableOpacity>
+            )}
           </>
         )}
         <TouchableOpacity accessibilityRole="button" onPress={() => void refresh().catch(() => {})}>
