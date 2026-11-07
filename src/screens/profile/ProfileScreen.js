@@ -1,3 +1,5 @@
+import { router } from 'expo-router';
+import { useSubscriptions } from '../../features/subscriptions/SubscriptionsProvider';
 import React from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Text from '../../design/Text';
@@ -11,10 +13,21 @@ import { CustomButton } from '../../components/common/CustomButton';
 
 export const ProfileScreen = ({ navigation }) => {
   const { user, role, logout } = useAuth();
+  const { currentPlanName } = useSubscriptions();
 
   const isFreelancer = role === 'freelancer';
 
   const menuItems = [
+    ...(isFreelancer
+      ? [
+          {
+            id: 'finance',
+            title: 'Thu nhập & công nợ',
+            icon: 'wallet-outline',
+            onPress: () => navigation.navigate('Finance'),
+          },
+        ]
+      : []),
     {
       id: 'm1',
       title: isFreelancer ? 'Đề xuất của tôi' : 'Dự án của tôi',
@@ -25,9 +38,15 @@ export const ProfileScreen = ({ navigation }) => {
       id: 'm2',
       title: 'SAM Premium',
       icon: 'sparkles-outline',
-      badge: user?.isPremium ? 'ĐANG DÙNG' : 'NÂNG CẤP',
-      badgeColor: user?.isPremium ? COLORS.success : COLORS.accent,
+      badge: currentPlanName ? 'ĐANG DÙNG' : 'NÂNG CẤP',
+      badgeColor: currentPlanName ? COLORS.success : COLORS.accent,
       onPress: () => navigation.navigate('Premium'),
+    },
+    {
+      id: 'payments',
+      title: 'Lịch sử thanh toán',
+      icon: 'receipt-outline',
+      onPress: () => router.push('/payments'),
     },
     {
       id: 'm3',
@@ -43,7 +62,13 @@ export const ProfileScreen = ({ navigation }) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* User Profile Header Component */}
-        <UserProfileHeader user={user} />
+        <UserProfileHeader
+          user={
+            user
+              ? { ...user, isPremium: Boolean(currentPlanName), premiumPlan: currentPlanName }
+              : user
+          }
+        />
 
         {/* Skills & Portfolio Section (For Freelancer) */}
         {isFreelancer && (

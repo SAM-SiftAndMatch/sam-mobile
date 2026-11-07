@@ -23,8 +23,8 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
 
   const handleConfirmSubscribe = async () => {
     try {
-      await subscribeToPlan(plan.id);
-      setShowSuccessModal(true);
+      const result = await subscribeToPlan(plan.id);
+      if (result.success) setShowSuccessModal(true);
     } catch {
       // The subscription provider exposes this failure in the error state above the form.
     }
@@ -60,7 +60,8 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
         <View style={styles.mockPaymentNotice}>
           <Ionicons name="shield-checkmark" size={20} color={COLORS.primary} />
           <Text style={styles.noticeText}>
-            Đây là gói dùng thử trong bản mẫu. Thao tác này không thực hiện thanh toán.
+            Gói được kích hoạt sau khi Pay2S xác nhận thanh toán. Bạn có thể kiểm tra giao dịch khi
+            quay lại ứng dụng.
           </Text>
         </View>
       </ScrollView>
@@ -81,8 +82,8 @@ export const PremiumPlanDetailScreen = ({ route, navigation }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Ionicons name="checkmark-circle" size={72} color={COLORS.success} />
-            <Text style={styles.modalTitle}>Đã kích hoạt gói mẫu</Text>
-            <Text style={styles.modalSub}>Tài khoản mẫu của bạn đã sử dụng gói {plan.name}.</Text>
+            <Text style={styles.modalTitle}>Gói đã được kích hoạt</Text>
+            <Text style={styles.modalSub}>Tài khoản của bạn đã sử dụng gói {plan.name}.</Text>
 
             <CustomButton
               title="Về tổng quan"

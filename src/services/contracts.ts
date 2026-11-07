@@ -39,6 +39,9 @@ export interface Repository {
   };
   subscriptions: {
     listPlans(): Promise<PremiumPlan[]>;
-    subscribe(userId: string, planId: string): Promise<{ success: boolean; plan: PremiumPlan }>;
+    subscribe(
+      userId: string,
+      planId: string,
+    ): Promise<{ success: boolean; plan: PremiumPlan; checkout?: import('./payments').Checkout }>;
   };
 }

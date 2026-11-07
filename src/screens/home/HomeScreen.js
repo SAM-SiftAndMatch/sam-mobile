@@ -14,6 +14,7 @@ import { LoadingState } from '../../components/common/LoadingState';
 import { ErrorState } from '../../components/common/ErrorState';
 import { EmptyState } from '../../components/common/EmptyState';
 import { COLORS } from '../../constants/colors';
+import { FreelancerFinanceHome } from '../finance/IncomeOverview';
 import { useAuth } from '../../features/auth/AuthProvider';
 
 export default function HomeScreen({ navigation }) {
@@ -54,6 +55,7 @@ export default function HomeScreen({ navigation }) {
             ? 'Tìm cơ hội phù hợp và theo dõi công việc của bạn.'
             : 'Biến ý tưởng thành dự án cùng chuyên gia phù hợp.'}
         </Text>
+        {freelancer && <FreelancerFinanceHome />}
         <View style={styles.prompt}>
           <View style={styles.promptIcon}>
             <Ionicons
