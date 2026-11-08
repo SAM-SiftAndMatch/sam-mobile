@@ -67,6 +67,7 @@ export async function openPayment(checkout: {
   if (checkout.checkoutUrl) await Linking.openURL(checkout.checkoutUrl);
 }
 export const payments = {
+  prepareRetry: (id: string) => apiRequest<Checkout>(`/checkouts/${id}/prepare-retry`, 'POST'),
   get: (id: string) => apiRequest<Checkout>(`/checkouts/${id}`),
   history: (page = 0) => apiRequest<Checkout[]>(`/checkouts/me?page=${page}`),
 };
